@@ -4,7 +4,7 @@ services:
     build:
       dockerfile: ./api/Dockerfile
       context: .
-    container_name: nest
+    container_name: library-api
     ports:
       - "3000:3000"
     volumes:
@@ -13,6 +13,18 @@ services:
       - api-network
     depends_on:
       - mysql
+
+  react:
+    build:
+      dockerfile: ./front/Dockerfile
+      context: .
+    container_name: library-front
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/usr/scr/app
+    networks:
+      - api-network
 
   mysql:
     image: mysql:8
