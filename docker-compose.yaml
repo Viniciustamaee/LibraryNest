@@ -1,0 +1,46 @@
+version: '3'
+services:
+  node:
+    build:
+      dockerfile: ./api/Dockerfile
+      context: .
+    container_name: nest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api:/usr/src/app/api
+    networks:
+      - api-network
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-nest
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "api"
+    networks:
+      - api-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_ARBITRARY: "1"
+    ports:
+      - "8080:80"
+    networks:
+      - api-network
+
+networks:
+  api-network:
+
+
+volumes:
+  db-data:
