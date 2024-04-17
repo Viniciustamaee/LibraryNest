@@ -21,7 +21,7 @@ export default function Books() {
 
             <div className='flex '>
                 <h1 className="text-xl ml-3 mt-3">Authors</h1>
-                <a href="/allbooks" className="hover:text-red-600 p-5 pl-4 text-sm">See more</a>
+                <a href="/author" className="hover:text-red-600 p-5 pl-4 text-sm">See more</a>
             </div>
             <div className=" flex flex-row justify-center grid xl:grid-cols-5  md:grid-cols-3 sm:grid-cols-1    ">
                 <IconAuthor />

@@ -8,6 +8,7 @@ import NotFound from "./components/notfound"
 import Authors from "./authors/index-author"
 import Rents from "./rents/index-rent"
 import Perfil from "./users/index-perfil"
+import OneBook from "./books/onebook"
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         {/* Books */}
         <Route path="book" element={<Books />} />
         <Route path="allbook" element={<AllBook />} />
+        <Route path="book/:id" element={<OneBook />} />
 
         {/* Authors */}
         <Route path="/author" element={<Authors />} />
@@ -31,7 +33,7 @@ function App() {
         <Route path="/rent/:id" element={<Rents />} />
 
         {/* User */}
-        <Route path="/user/1" element={<Perfil />} />
+        <Route path="/user/:id" element={<Perfil />} />
 
         {/* Notfound */}
         <Route path="*" element={<NotFound />} />
