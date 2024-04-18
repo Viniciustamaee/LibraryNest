@@ -15,14 +15,14 @@ export default function NavBar() {
                         arrowIcon={false}
                         inline
                         label={
-                            <Avatar alt="User settings" img="https://res.cloudinary.com/dtuxy5k7v/image/upload/v1710514781/vector-flat-illustration-grayscale-avatar-600nw-2281862025_grjznc.jpg" rounded />
+                            <Avatar alt="User settings" img="" rounded />
                         }
                     >
                         <Dropdown.Header>
                             <span className="block text-sm">Bonnie Green</span>
                             <span className="block truncate text-sm font-medium">name@flowbite.com</span>
                         </Dropdown.Header>
-                        <a href="/user/1"><Dropdown.Item>Perfil</Dropdown.Item></a>
+                        <a href="/perfil/1"><Dropdown.Item>Perfil</Dropdown.Item></a>
                         <a href="/rent/1"><Dropdown.Item>Rents</Dropdown.Item></a>
                         <Dropdown.Divider />
                         <Dropdown.Item>Sign out</Dropdown.Item>

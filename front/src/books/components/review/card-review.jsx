@@ -8,9 +8,9 @@ export default function ReviewCard() {
     return (
         <>
             <div className="flex justify-center">
-                <form style={{ width: "590px" }} >
+                <form style={{ width: "590px" }} className='bg-gray-7800	 p-3'>
                     <div className="">
-                        <h1 className="text-center text-xl text-black">Rating</h1>
+                        <h1 className="text-center text-xl">Rating</h1>
 
                         <Box
                             sx={{
@@ -29,7 +29,7 @@ export default function ReviewCard() {
 
 
                     </div>
-                    <h1 className="text-center text-xl mb-1 text-black">Comment</h1>
+                    <h1 className="text-center text-xl mb-1">Comment</h1>
                     <div class="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                         <div class="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
                             <label for="comment" class="sr-only">Your comment</label>
