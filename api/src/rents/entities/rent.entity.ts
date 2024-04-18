@@ -1,7 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "src/users/entities/user.entity";
 import { BookEntity } from "src/books/entities/book.entity";
-@Entity()
+@Entity({
+    name: 'rents'
+})
 export class RentEntity {
     @PrimaryGeneratedColumn()
     id: number;

@@ -2,7 +2,9 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 't
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { AuthorEntity } from 'src/authors/entities/author.entity';
 
-@Entity()
+@Entity({
+    name: "books"
+})
 export class BookEntity {
     @PrimaryGeneratedColumn()
     id: number;
