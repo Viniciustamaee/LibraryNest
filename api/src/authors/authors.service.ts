@@ -1,38 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthorEntity } from './entities/author.entity';
 
+
 @Injectable()
 export class AuthorsService {
 
   constructor(
     @InjectRepository(AuthorEntity)
-    private usersRepository: Repository<AuthorEntity>
+    private authorRepository: Repository<AuthorEntity>
   ) { }
 
-  create(createAuthorDto: CreateAuthorDto) {
-    const sla = this.usersRepository.create({
-
+  async create(createAuthorDto: CreateAuthorDto) {
+    const existingAuthor = await this.authorRepository.findOne({
+      where: {
+        name: createAuthorDto.name
+      }
     })
-    return 'This action adds a new author';
+
+    if (existingAuthor) {
+      return "Exist the author"
+    }
+
+
+    const newAuthor = this.authorRepository.create(createAuthorDto);
+    return await this.authorRepository.save(newAuthor);
   }
 
-  findAll() {
-    return `This action returns all authors`;
+  async findAll() {
+    const allAuthor = await this.authorRepository.find()
+    return allAuthor;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} author`;
+  async findOne(id: number) {
+    const oneAuthor = await this.authorRepository.findBy({ id })
+    return oneAuthor;
   }
 
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    return `This action updates a #${id} author`;
+  async update(id: number, { name }: UpdateAuthorDto) {
+
+    if (!this.existing(id)) {
+      throw new NotFoundException(`Author with ID ${id} not found`);
+    }
+
+    await this.authorRepository.update(id, { name });
+
+    const updatedAuthor = await this.authorRepository.findBy({ id });
+
+    return updatedAuthor;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} author`;
+
+  async remove(id: number) {
+
+    if (!this.existing) {
+      throw new NotFoundException(`Author with ID ${id} not found`);
+    }
+
+    const deleteAuthor = await this.authorRepository.delete({ id })
+
+    return deleteAuthor;
+  }
+
+
+  existing(id: number) {
+    return this.authorRepository.findOne({
+      where: {
+        id
+      }
+    })
   }
 }

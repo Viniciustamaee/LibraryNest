@@ -5,7 +5,7 @@ import { UpdateAuthorDto } from './dto/update-author.dto';
 
 @Controller('authors')
 export class AuthorsController {
-  constructor(private readonly authorsService: AuthorsService) {}
+  constructor(private readonly authorsService: AuthorsService) { }
 
   @Post()
   create(@Body() createAuthorDto: CreateAuthorDto) {
@@ -23,8 +23,8 @@ export class AuthorsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthorDto: UpdateAuthorDto) {
-    return this.authorsService.update(+id, updateAuthorDto);
+  update(@Param('id') id: string, @Body() { name }: UpdateAuthorDto) {
+    return this.authorsService.update(+id, { name });
   }
 
   @Delete(':id')
