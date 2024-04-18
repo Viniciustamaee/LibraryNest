@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { AuthorEntity } from './entities/author.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 
 @Injectable()
@@ -14,10 +14,10 @@ export class AuthorsService {
     private authorRepository: Repository<AuthorEntity>
   ) { }
 
-  async create(createAuthorDto: CreateAuthorDto) {
+  async create({ name }: CreateAuthorDto) {
     const existingAuthor = await this.authorRepository.findOne({
       where: {
-        name: createAuthorDto.name
+        name
       }
     })
 
@@ -26,7 +26,7 @@ export class AuthorsService {
     }
 
 
-    const newAuthor = this.authorRepository.create(createAuthorDto);
+    const newAuthor = await this.authorRepository.create({ name });
     return await this.authorRepository.save(newAuthor);
   }
 

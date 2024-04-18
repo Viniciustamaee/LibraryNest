@@ -17,7 +17,14 @@ import { UserEntity } from './users/entities/user.entity';
 
 
 @Module({
-  imports: [UsersModule, BooksModule, RentsModule, AuthorsModule, ReviewsModule, CategoriesModule,
+  imports: [
+    UsersModule,
+    BooksModule,
+    RentsModule,
+    AuthorsModule,
+    ReviewsModule,
+    CategoriesModule,
+
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: "mysql",
@@ -25,7 +32,6 @@ import { UserEntity } from './users/entities/user.entity';
       username: "root",
       password: "root",
       database: "api",
-
       entities: [
         AuthorEntity,
         BookEntity,
@@ -36,6 +42,7 @@ import { UserEntity } from './users/entities/user.entity';
       ],
       synchronize: true,
     })],
+
   controllers: [AppController],
   providers: [AppService],
 })

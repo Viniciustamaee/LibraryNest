@@ -8,8 +8,8 @@ export class AuthorEntity {
     id: number;
 
     @Column({
-        length: 255,
-        unique: true
+        unique: true,
+        length: 143
     })
     name: string;
 }
