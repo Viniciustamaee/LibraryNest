@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,19 +25,47 @@ export class ReviewsService {
     return await this.reviewsRepository.save(newReview);
   }
 
-  findAll() {
-    return `This action returns all reviews`;
+  async findAll() {
+    const allReviews = await this.reviewsRepository.find({ relations: ['book', 'user'] })
+
+    return allReviews
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+  async findOne(id: number) {
+
+    const existingReview = await this.existing(id);
+
+    if (!existingReview) {
+      throw new NotFoundException(`Review with ID ${id} not found`);
+    }
+
+
+    const oneReview = await this.reviewsRepository.findOne({ where: { id }, relations: ['book', 'user'] })
+
+
+    return oneReview;
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+
+  async remove(id: number) {
+    const existingReview = await this.existing(id);
+
+    if (!existingReview) {
+      throw new NotFoundException(`Review with ID ${id} not found`);
+    }
+
+    const deleteBook = await this.reviewsRepository.delete({ id })
+
+    return deleteBook;
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+
+  existing(id: number) {
+    return this.reviewsRepository.findOne({
+      where: {
+        id
+      }
+    })
   }
 }
