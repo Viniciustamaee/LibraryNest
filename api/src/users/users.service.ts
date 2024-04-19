@@ -44,17 +44,25 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const oneUser = await this.usersRepository.findBy({ id })
-    if (oneUser.length <= 0) {
-      return "this user does not exist"
+
+    const existingUser = await this.existing(id)
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
+
+
+    const oneUser = await this.usersRepository.findBy({ id })
+
 
     return oneUser;
   }
 
   async update(id: number, data: UpdateUserDto) {
-    if (!this.existing(id)) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+    const existingUser = await this.existing(id)
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
 
     await this.usersRepository.update(id, data);
@@ -65,8 +73,10 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    if (!this.existing) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+    const existingUser = await this.existing(id)
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
 
     const deleteBook = await this.usersRepository.delete({ id })

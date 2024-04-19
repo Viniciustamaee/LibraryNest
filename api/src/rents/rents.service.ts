@@ -1,26 +1,103 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRentDto } from './dto/create-rent.dto';
 import { UpdateRentDto } from './dto/update-rent.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { RentEntity } from './entities/rent.entity';
+import { Repository } from 'typeorm';
+import { BooksService } from 'src/books/books.service';
 
 @Injectable()
 export class RentsService {
-  create(createRentDto: CreateRentDto) {
-    return 'This action adds a new rent';
+
+  constructor(
+    @InjectRepository(RentEntity)
+    private rentsRepository: Repository<RentEntity>,
+    private readonly booksService: BooksService
+  ) { }
+
+  async create({ due_date, book_id, rented_date, user_id }: CreateRentDto) {
+    const book = await this.booksService.existing(book_id);
+
+    if (!book) {
+      throw new NotFoundException(`Book with ID ${book_id} not found`);
+    }
+
+    if (book.quantity_available > 0) {
+      book.quantity_available -= 1;
+      await this.booksService.update(book_id, { quantity_available: book.quantity_available });
+
+    } else {
+      throw new BadRequestException(`Book with ID ${book_id} is not available for rent`);
+    }
+
+    const newRents = this.rentsRepository.create({
+      due_date,
+      rented_date,
+      book: { id: book_id },
+      user: { id: user_id }
+    });
+
+    return await this.rentsRepository.save(newRents);
   }
 
-  findAll() {
-    return `This action returns all rents`;
+
+  async findAll() {
+    const allRents = await this.rentsRepository.find({ relations: ['book', 'user'] })
+
+    return allRents;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rent`;
+  async findOne(id: number) {
+    const existingRents = await this.existing(id)
+
+    if (!existingRents) {
+      throw new NotFoundException(`Rents with ID ${id} not found`);
+    }
+
+    const oneRents = await this.rentsRepository.findOne({ where: { id }, relations: ['category', 'author'] })
+
+    return oneRents;
+
   }
 
-  update(id: number, updateRentDto: UpdateRentDto) {
-    return `This action updates a #${id} rent`;
+  async update(id: number, data: UpdateRentDto) {
+
+    const existingRents = await this.existing(id)
+
+    if (!existingRents) {
+      throw new NotFoundException(`Rents with ID ${id} not found`);
+    }
+
+    const updateBook = await this.rentsRepository.update(id, data);
+
+
+    return updateBook;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} rent`;
+  async remove(id: number) {
+
+    const showRents = await this.rentsRepository.findOne({ where: { id }, relations: ['book'] })
+    console.log(showRents.book.id)
+
+    if (showRents.book.quantity_available > 0) {
+      showRents.book.quantity_available += 1;
+      await this.booksService.update(showRents.book.id, { quantity_available: showRents.book.quantity_available });
+
+    } else {
+      throw new BadRequestException(`Book with ID ${showRents.book.id} is not available for rent`);
+    }
+
+    return { message: `Rent with ID ${id} successfully deleted and book quantity updated` };
+  }
+
+
+
+
+  existing(id: number) {
+    return this.rentsRepository.findOne({
+      where: {
+        id
+      }
+    })
   }
 }

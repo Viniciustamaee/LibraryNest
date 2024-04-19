@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "src/users/entities/user.entity";
 import { BookEntity } from "src/books/entities/book.entity";
 @Entity({
@@ -10,13 +10,11 @@ export class RentEntity {
 
     @Column({
         type: 'date'
-
     })
     rented_date: Date;
 
     @Column({
         type: 'date'
-
     })
     due_date: Date;
 

@@ -35,14 +35,23 @@ export class CategoriesService {
   }
 
   async findOne(id: number) {
+    const existingCategories = await this.existing(id)
+
+    if (!existingCategories) {
+      throw new NotFoundException(`Categorie with ID ${id} not found`);
+    }
+
+
     const oneCategory = await this.categoryRepository.findBy({ id })
     return oneCategory;
   }
 
   async update(id: number, { category_name }: UpdateCategoryDto) {
 
-    if (!this.existing(id)) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+    const existingCategories = await this.existing(id)
+
+    if (!existingCategories) {
+      throw new NotFoundException(`Categorie with ID ${id} not found`);
     }
 
     await this.categoryRepository.update(id, { category_name });
@@ -54,8 +63,10 @@ export class CategoriesService {
 
   async remove(id: number) {
 
-    if (!this.existing) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+    const existingCategories = await this.existing(id)
+
+    if (!existingCategories) {
+      throw new NotFoundException(`Categorie with ID ${id} not found`);
     }
 
     const deleteCategory = await this.categoryRepository.delete({ id })

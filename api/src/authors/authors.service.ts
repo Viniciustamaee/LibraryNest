@@ -36,13 +36,22 @@ export class AuthorsService {
   }
 
   async findOne(id: number) {
+
+    const existingAuthor = await this.existing(id)
+
+    if (!existingAuthor) {
+      throw new NotFoundException(`Author with ID ${id} not found`);
+    }
+
     const oneAuthor = await this.authorRepository.findBy({ id })
     return oneAuthor;
   }
 
   async update(id: number, { name }: UpdateAuthorDto) {
 
-    if (!this.existing(id)) {
+    const existingAuthor = await this.existing(id)
+
+    if (!existingAuthor) {
       throw new NotFoundException(`Author with ID ${id} not found`);
     }
 
@@ -56,7 +65,9 @@ export class AuthorsService {
 
   async remove(id: number) {
 
-    if (!this.existing) {
+    const existingAuthor = await this.existing(id)
+
+    if (!existingAuthor) {
       throw new NotFoundException(`Author with ID ${id} not found`);
     }
 

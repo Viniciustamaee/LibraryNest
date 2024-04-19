@@ -43,29 +43,35 @@ export class BooksService {
   }
 
   async findOne(id: number) {
+
+    const existingBooks = await this.existing(id)
+
+    if (!existingBooks) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
+    }
+
     const oneBook = await this.bookRepository.findOne({ where: { id }, relations: ['category', 'author'] })
 
     return oneBook;
   }
 
   async update(id: number, data: UpdateBookDto) {
-    if (!this.existing(id)) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+    const existingBooks = await this.existing(id)
+
+    if (!existingBooks) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
     }
 
-
-    await this.bookRepository.update(id, data);
-
-
-    const updateBook = await this.bookRepository.findBy({ id });
-
+    const updateBook = await this.bookRepository.update(id, data);
 
     return updateBook;
   }
 
   async remove(id: number) {
-    if (!this.existing) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+    const existingBooks = await this.existing(id)
+
+    if (!existingBooks) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
     }
 
     const deleteBook = await this.bookRepository.delete({ id })

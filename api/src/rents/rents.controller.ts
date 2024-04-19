@@ -5,11 +5,11 @@ import { UpdateRentDto } from './dto/update-rent.dto';
 
 @Controller('rents')
 export class RentsController {
-  constructor(private readonly rentsService: RentsService) {}
+  constructor(private readonly rentsService: RentsService) { }
 
   @Post()
-  create(@Body() createRentDto: CreateRentDto) {
-    return this.rentsService.create(createRentDto);
+  create(@Body() { book_id, due_date, rented_date, user_id }: CreateRentDto) {
+    return this.rentsService.create({ book_id, due_date, rented_date, user_id });
   }
 
   @Get()
@@ -23,8 +23,8 @@ export class RentsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRentDto: UpdateRentDto) {
-    return this.rentsService.update(+id, updateRentDto);
+  update(@Param('id') id: string, @Body() data: UpdateRentDto) {
+    return this.rentsService.update(+id, data);
   }
 
   @Delete(':id')
