@@ -12,9 +12,13 @@ export class ReviewEntity {
     @Column()
     rating: number;
 
+    @Column({
+        type: "longtext"
+    })
+    comment: string
+
     @ManyToOne(() => UserEntity)
     @JoinColumn({ name: 'user_id' })
-
     user: UserEntity
 
 

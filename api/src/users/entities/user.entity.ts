@@ -14,8 +14,11 @@ export class UserEntity {
     })
     email: string;
 
-    @Column({})
+    @Column({
+        unique: true
+    })
     username: string
+
 
     @Column({
         length: 255
@@ -35,10 +38,10 @@ export class UserEntity {
 
     @Column({
         type: 'enum',
-        enum: ['0', '1'],
-        default: '0'
+        enum: [0, 1],
+        default: 0
     })
-    admin: '0' | '1';
+    admin: 0 | 1;
 
 
 }

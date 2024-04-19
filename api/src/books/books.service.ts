@@ -13,6 +13,7 @@ export class BooksService {
     private bookRepository: Repository<BookEntity>) { }
 
 
+
   async create({ category_id, author_id, description, img, quantity_available, title }: CreateBookDto) {
     const existingBook = await this.bookRepository.findOne({
       where: { title }
@@ -48,12 +49,9 @@ export class BooksService {
   }
 
   async update(id: number, data: UpdateBookDto) {
-
-
     if (!this.existing(id)) {
       throw new NotFoundException(`Author with ID ${id} not found`);
     }
-
 
 
     await this.bookRepository.update(id, data);
