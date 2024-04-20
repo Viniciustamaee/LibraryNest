@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { CategoriesService } from 'src/categories/categories.service';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('books')
 export class BooksController {
@@ -10,6 +11,7 @@ export class BooksController {
   ) { }
 
   @Post()
+  @UseGuards(AuthGuard)
   create(@Body() { category_id, author_id, description, img, quantity_available, title }: CreateBookDto) {
     return this.booksService.create({ author_id, category_id, description, img, quantity_available, title });
   }
@@ -25,11 +27,13 @@ export class BooksController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   update(@Param('id') id: string, @Body() data: UpdateBookDto) {
     return this.booksService.update(+id, data);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
   }

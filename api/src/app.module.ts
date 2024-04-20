@@ -14,6 +14,7 @@ import { RentEntity } from './rents/entities/rent.entity';
 import { AuthorEntity } from './authors/entities/author.entity';
 import { ReviewEntity } from './reviews/entities/review.entity';
 import { UserEntity } from './users/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -24,6 +25,7 @@ import { UserEntity } from './users/entities/user.entity';
     AuthorsModule,
     ReviewsModule,
     CategoriesModule,
+    AuthModule,
 
     TypeOrmModule.forRoot({
       type: 'mysql',
