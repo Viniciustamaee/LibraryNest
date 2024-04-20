@@ -42,6 +42,7 @@ export class UsersService {
     const allBooks = await this.usersRepository.find()
     return allBooks;
   }
+  
 
   async findOne(id: number) {
 

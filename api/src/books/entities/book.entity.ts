@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
-import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { AuthorEntity } from 'src/authors/entities/author.entity';
+import { CategoryEntity } from 'src/categories/entities/category.entity';
 
 @Entity({
     name: "books"

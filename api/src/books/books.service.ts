@@ -4,13 +4,18 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { BookEntity } from './entities/book.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AuthorsService } from 'src/authors/authors.service';
+import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()
 export class BooksService {
 
   constructor(
     @InjectRepository(BookEntity)
-    private bookRepository: Repository<BookEntity>) { }
+    private bookRepository: Repository<BookEntity>,
+    private readonly categoryService: CategoriesService,
+    private readonly authorService: AuthorsService,
+    ) { }
 
 
 
@@ -18,6 +23,9 @@ export class BooksService {
     const existingBook = await this.bookRepository.findOne({
       where: { title }
     });
+
+    await this.authorService.findOne(author_id)
+    await this.categoryService.findOne(category_id)
 
     if (existingBook) {
       return "The book with the same title already exists";
@@ -42,6 +50,7 @@ export class BooksService {
     return allBooks;
   }
 
+
   async findOne(id: number) {
 
     const existingBooks = await this.existing(id)
@@ -54,6 +63,7 @@ export class BooksService {
 
     return oneBook;
   }
+
 
   async update(id: number, data: UpdateBookDto) {
     const existingBooks = await this.existing(id)

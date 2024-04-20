@@ -30,6 +30,7 @@ export class AuthorsService {
     return await this.authorRepository.save(newAuthor);
   }
 
+  
   async findAll() {
     const allAuthor = await this.authorRepository.find()
     return allAuthor;

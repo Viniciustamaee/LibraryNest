@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RentEntity } from './entities/rent.entity';
 import { Repository } from 'typeorm';
 import { BooksService } from 'src/books/books.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class RentsService {
@@ -12,23 +13,30 @@ export class RentsService {
   constructor(
     @InjectRepository(RentEntity)
     private rentsRepository: Repository<RentEntity>,
-    private readonly booksService: BooksService
+    private readonly booksService: BooksService,
+    private readonly userService: UsersService
+
   ) { }
 
   async create({ due_date, book_id, rented_date, user_id }: CreateRentDto) {
     const book = await this.booksService.existing(book_id);
+    const user = await this.userService.existing(user_id);
+    
 
     if (!book) {
       throw new NotFoundException(`Book with ID ${book_id} not found`);
     }
 
-    if (book.quantity_available > 0) {
-      book.quantity_available -= 1;
-      await this.booksService.update(book_id, { quantity_available: book.quantity_available });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${user_id} not found`);
+    }
 
-    } else {
+    if (book.quantity_available < 0) {
       throw new BadRequestException(`Book with ID ${book_id} is not available for rent`);
     }
+
+    book.quantity_available -= 1;
+    await this.booksService.update(book_id, { quantity_available: book.quantity_available });
 
     const newRents = this.rentsRepository.create({
       due_date,
@@ -54,7 +62,7 @@ export class RentsService {
       throw new NotFoundException(`Rents with ID ${id} not found`);
     }
 
-    const oneRents = await this.rentsRepository.findOne({ where: { id }, relations: ['category', 'author'] })
+    const oneRents = await this.rentsRepository.findOne({ where: { id }})
 
     return oneRents;
 
@@ -77,7 +85,6 @@ export class RentsService {
   async remove(id: number) {
 
     const showRents = await this.rentsRepository.findOne({ where: { id }, relations: ['book'] })
-    console.log(showRents.book.id)
 
     if (showRents.book.quantity_available > 0) {
       showRents.book.quantity_available += 1;

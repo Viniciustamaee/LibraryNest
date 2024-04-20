@@ -27,7 +27,7 @@ services:
       - api-network
 
   mysql:
-    image: mysql:8
+    image: mysql:latest
     container_name: mysql-nest
     ports:
       - "3306:3306"
