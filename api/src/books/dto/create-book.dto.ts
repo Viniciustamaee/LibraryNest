@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString, IsUrl, Length } from "class-validator";
+import { IsInt, IsNotEmpty, IsString, Length } from "class-validator";
 
 export class CreateBookDto {
     @Length(3)
@@ -10,8 +10,6 @@ export class CreateBookDto {
     @IsNotEmpty()
     quantity_available: number;
 
-    @IsString()
-    @IsUrl()
     img: string;
 
     @IsString()

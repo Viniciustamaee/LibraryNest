@@ -17,8 +17,6 @@ export class BooksService {
     private readonly authorService: AuthorsService,
     ) { }
 
-
-
   async create({ category_id, author_id, description, img, quantity_available, title }: CreateBookDto) {
     const existingBook = await this.bookRepository.findOne({
       where: { title }

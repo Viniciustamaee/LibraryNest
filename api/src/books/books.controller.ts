@@ -1,19 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { CategoriesService } from 'src/categories/categories.service';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService,
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly cloudinaryService: CloudinaryService
   ) { }
 
   @Post()
   @UseGuards(AuthGuard)
-  create(@Body() { category_id, author_id, description, img, quantity_available, title }: CreateBookDto) {
-    return this.booksService.create({ author_id, category_id, description, img, quantity_available, title });
+  @UseInterceptors(FileInterceptor('img')) 
+  async create(@Body() body: CreateBookDto, @UploadedFile() file: Express.Multer.File) {
+    const imgUrl = await this.cloudinaryService.uploadImage(file);
+    const book = await this.booksService.create({ ...body, img: imgUrl });
+    return book;
   }
 
   @Get()
@@ -28,13 +34,20 @@ export class BooksController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  update(@Param('id') id: string, @Body() data: UpdateBookDto) {
-    return this.booksService.update(+id, data);
+  @UseInterceptors(FileInterceptor('img')) 
+  async update(@Param('id') id: string, @Body() data: UpdateBookDto, @UploadedFile() file?: Express.Multer.File) {
+    let imgUrl;
+    if (file) {
+      imgUrl = await this.cloudinaryService.uploadImage(file);
+    }
+    return this.booksService.update(+id, { ...data, img: imgUrl });
   }
+
 
   @Delete(':id')
   @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
   }
+  
 }

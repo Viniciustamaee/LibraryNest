@@ -15,7 +15,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
         TypeOrmModule.forFeature([UserEntity]) 
 
         ],
-    controllers: [authController], // Correção aqui
+    controllers: [authController],
     providers: [AuthService]
 })
 

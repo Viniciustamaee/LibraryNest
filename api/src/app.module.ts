@@ -15,6 +15,7 @@ import { AuthorEntity } from './authors/entities/author.entity';
 import { ReviewEntity } from './reviews/entities/review.entity';
 import { UserEntity } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -26,6 +27,7 @@ import { AuthModule } from './auth/auth.module';
     ReviewsModule,
     CategoriesModule,
     AuthModule,
+    CloudinaryModule,
 
     TypeOrmModule.forRoot({
       type: 'mysql',

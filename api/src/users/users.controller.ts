@@ -1,16 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cloudinaryService: CloudinaryService
+
+    ) { }
 
   @Post()
-  create(@Body() data: CreateUserDto) {
-    return this.usersService.create(data);
+  @UseInterceptors(FileInterceptor('img')) 
+  async create(@Body() data: CreateUserDto,@UploadedFile() file: Express.Multer.File) {
+    const imgUrl = await this.cloudinaryService.uploadImage(file);
+    const book = await this.usersService.create({ ...data, img: imgUrl });
+    return book;
   }
 
   @Get()
@@ -25,8 +34,13 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @UseInterceptors(FileInterceptor('img')) 
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @UploadedFile() file?: Express.Multer.File) {
+    let imgUrl;
+    if (file) {
+      imgUrl = await this.cloudinaryService.uploadImage(file);
+    }
+    return this.usersService.update(+id, { ...updateUserDto, img: imgUrl });
   }
 
   @Delete(':id')

@@ -5,12 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BookEntity } from './entities/book.entity';
 import { AuthorsModule } from 'src/authors/authors.module';
 import { CategoriesModule } from 'src/categories/categories.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([BookEntity]),
     AuthorsModule,
-    CategoriesModule
+    CategoriesModule,
+    CloudinaryModule
   ],
   controllers: [BooksController],
   providers: [BooksService],

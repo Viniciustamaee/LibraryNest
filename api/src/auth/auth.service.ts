@@ -20,7 +20,7 @@ export class AuthService {
     async createToken() {
         const payload = { expiresIn: '7 days' };
         const accessToken = this.jwtService.sign(payload);
-        return { accessToken }; // Retorna o token gerado
+        return { accessToken }; 
     }
 
     async login(password: string, email: string) {
