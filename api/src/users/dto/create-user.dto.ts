@@ -20,7 +20,6 @@ export class CreateUserDto {
     })
     password: string
 
-    @IsUrl()
     img: string;
 
     @IsString()

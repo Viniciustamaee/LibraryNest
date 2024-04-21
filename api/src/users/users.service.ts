@@ -60,17 +60,22 @@ export class UsersService {
   }
 
   async update(id: number, data: UpdateUserDto) {
-    const existingUser = await this.existing(id)
-
+    const existingUser = await this.existing(id);
     if (!existingUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-
-    await this.usersRepository.update(id, data);
-
-    const updateUser = await this.usersRepository.findBy({ id });
-
-    return updateUser;
+  
+    const hashedPassword = await bcrypt.hash(data.password, salts);
+  
+    const updatedUserData = {
+      ...data,
+      password: hashedPassword, 
+    };
+  
+    await this.usersRepository.update(id, updatedUserData);
+  
+    const updatedUser = await this.usersRepository.findBy({ id });
+    return updatedUser;
   }
 
   async remove(id: number) {

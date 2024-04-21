@@ -1,0 +1,18 @@
+#container {
+    height: 100vh;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+        url("https://res.cloudinary.com/dtuxy5k7v/image/upload/v1710515062/photo-1544640808-32ca72ac7f37_rbdc3c.jpg");
+    background-size: cover;
+    background-position: center;
+    text-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 5rem rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+}
+
+#content {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

@@ -23,17 +23,18 @@ export class AuthService {
         return { accessToken }; 
     }
 
-    async login(password: string, email: string) {
+    async login(password: string, username: string) {
         const existingUser = await this.usersRepository.findOne({
-            where: { email }
+            where: { username }
         });
 
+
         if (!existingUser) {
-            throw new UnauthorizedException('E-mail or password wrong.');
+            throw new UnauthorizedException('Username or password wrong.');
         }
 
         if (!(await bcrypt.compare(password, existingUser.password))) {
-            throw new UnauthorizedException('E-mail or password wrong');
+            throw new UnauthorizedException('Username or password wrong');
         }
 
         return { ...(await this.createToken()), user: existingUser };

@@ -22,6 +22,8 @@ export class UsersController {
     return book;
   }
 
+  
+
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -33,7 +35,6 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('img')) 
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @UploadedFile() file?: Express.Multer.File) {
     let imgUrl;

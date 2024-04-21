@@ -1,0 +1,9 @@
+#boxRents {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}

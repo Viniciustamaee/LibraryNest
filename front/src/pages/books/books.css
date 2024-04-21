@@ -1,0 +1,22 @@
+body {
+    background-color: #14213d;
+}
+
+h1,
+h2,
+p {
+    color: white;
+}
+
+#background {
+    height: 50vh;
+    width: 100%;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+        url("https://res.cloudinary.com/dtuxy5k7v/image/upload/v1710515903/photo-1521587760476-6c12a4b040da_k1lbgd.jpg");
+    background-size: cover;
+    background-position: center;
+    text-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 5rem rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    border-radius: 40px;
+}
