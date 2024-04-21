@@ -1,14 +1,16 @@
-import { Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
+import { Injectable } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class CloudinaryService {
   constructor() {
     cloudinary.config({
-      cloud_name: 'dtuxy5k7v',
-      api_key: '631759363798366',
-      api_secret: 'j3AdG6dgyludTedwZB2zQKBws54',
-      folder: 'Nest'
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+      folder: process.env.CLOUDINARY_FOLDER
     });
   }
 

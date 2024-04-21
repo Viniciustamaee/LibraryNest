@@ -5,11 +5,14 @@ import { AuthService } from "./auth.service";
 import { authController } from "./auth.controller";
 import { UserEntity } from "src/users/entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 
 @Module({
     imports: [
         JwtModule.register({
-            secret: 'secredo'
+            secret: process.env.JWT_SECRET
         }),
         UsersModule,
         TypeOrmModule.forFeature([UserEntity]) 

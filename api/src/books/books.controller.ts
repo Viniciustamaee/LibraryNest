@@ -4,6 +4,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Multer } from 'multer'; // Importe Multer diretamente
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('books')
@@ -15,7 +16,7 @@ export class BooksController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('img')) 
+  @UseInterceptors(FileInterceptor('img')) // Interceptador para o campo 'img' do corpo da requisição
   async create(@Body() body: CreateBookDto, @UploadedFile() file: Express.Multer.File) {
     const imgUrl = await this.cloudinaryService.uploadImage(file);
     const book = await this.booksService.create({ ...body, img: imgUrl });
@@ -34,20 +35,22 @@ export class BooksController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('img')) 
-  async update(@Param('id') id: string, @Body() data: UpdateBookDto, @UploadedFile() file?: Express.Multer.File) {
-    let imgUrl;
-    if (file) {
-      imgUrl = await this.cloudinaryService.uploadImage(file);
-    }
-    return this.booksService.update(+id, { ...data, img: imgUrl });
+  update(@Param('id') id: string, @Body() data: UpdateBookDto) {
+    return this.booksService.update(+id, data);
   }
-
 
   @Delete(':id')
   @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
+  }
+
+
+  @Post('teste')
+  @UseInterceptors(FileInterceptor('img')) 
+  async teste(@UploadedFile() img: Express.Multer.File) {
+    const imgUrl = await this.cloudinaryService.uploadImage(img);
+    return { imgUrl };
   }
   
 }
