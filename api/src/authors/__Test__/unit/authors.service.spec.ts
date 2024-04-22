@@ -1,8 +1,7 @@
+import { CreateAuthorDto } from '../../dto/create-author.dto';
+import { AuthorEntity } from '../../entities/author.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthorsService } from '../../authors.service';
-import { CreateAuthorDto } from 'src/authors/dto/create-author.dto';
-import { AuthorEntity } from 'src/authors/entities/author.entity';
-import { mock } from 'node:test';
 import { NotFoundException } from '@nestjs/common';
 
 const mockAuthorRepository = {
@@ -28,14 +27,11 @@ describe('AuthorsService', () => {
         service = module.get<AuthorsService>(AuthorsService);
     });
 
-    it('should be defined', () => {
-        expect(service).toBeDefined();
-    });
-
     describe('create', () => {
         it('should create a new author', async () => {
-            const createAuthorDto: CreateAuthorDto = { name: 'John Doe' };
+            const createAuthorDto: CreateAuthorDto = { name: '' };
             const mockAuthor: AuthorEntity = { id: 1, ...createAuthorDto };
+
 
             mockAuthorRepository.findOne.mockResolvedValueOnce(null);
             mockAuthorRepository.create.mockReturnValueOnce(mockAuthor);

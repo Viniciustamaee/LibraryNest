@@ -42,7 +42,7 @@ export class CategoriesService {
     }
 
 
-    const oneCategory = await this.categoryRepository.findBy({ id })
+    const oneCategory = await this.categoryRepository.findOne({ where: { id } })
     return oneCategory;
   }
 
@@ -56,7 +56,7 @@ export class CategoriesService {
 
     await this.categoryRepository.update(id, { category_name });
 
-    const updatedCategory = await this.categoryRepository.findBy({ id });
+    const updatedCategory = await this.categoryRepository.findOne({ where: { id } });
 
     return updatedCategory;
   }

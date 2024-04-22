@@ -1,10 +1,10 @@
-import { IsNotEmpty, IsString, Length } from "class-validator";
+import { IsNotEmpty, IsString, Length, MinLength } from "class-validator";
 
 export class CreateAuthorDto {
 
     @IsNotEmpty()
     @IsString()
-    @Length(3)
+    @MinLength(2)
     name: string
 
 }
