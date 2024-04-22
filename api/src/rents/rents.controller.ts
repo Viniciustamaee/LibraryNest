@@ -24,7 +24,7 @@ export class RentsController {
   }
 
   @Get(':id/one')
-  findOneRents(@Param('id') id: string){
+  findOneRents(@Param('id') id: string) {
     return this.rentsService.findOneRents(+id)
   }
 

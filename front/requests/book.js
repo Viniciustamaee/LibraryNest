@@ -34,7 +34,7 @@ export const updateBook = async (id, formDataObject, config) => {
 export const insertBooks = async (formData, config) => {
     try {
         const response = await apiFecth.post(`/Books`, formData, config);
-        return response.data; // Retorna os dados do livro inserido pela API
+        return response.data;
     } catch (error) {
         console.log(error);
         throw error;

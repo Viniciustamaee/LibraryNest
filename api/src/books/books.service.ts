@@ -15,17 +15,17 @@ export class BooksService {
     private bookRepository: Repository<BookEntity>,
     private readonly categoryService: CategoriesService,
     private readonly authorService: AuthorsService,
-    ) { }
+  ) { }
 
   async create({ category_id, author_id, description, img, quantity_available, title }: CreateBookDto) {
-    
+
     const existingBook = await this.bookRepository.findOne({
       where: { title }
     });
-    
+
     await this.authorService.findOne(author_id)
     await this.categoryService.findOne(category_id)
-    
+
     if (existingBook) {
       return "The book with the same title already exists";
     }
@@ -67,6 +67,11 @@ export class BooksService {
   async update(id: number, data: UpdateBookDto) {
     const existingBooks = await this.existing(id)
 
+    if (!data) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
+    }
+
+
     if (!existingBooks) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
@@ -82,14 +87,14 @@ export class BooksService {
     if (!existingBooks) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
-    
+
 
     const deleteBook = await this.bookRepository.delete({ id })
 
     return deleteBook;
   }
 
-  
+
 
   existing(id: number) {
     return this.bookRepository.findOne({

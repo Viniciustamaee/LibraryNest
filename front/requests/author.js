@@ -29,7 +29,7 @@ export const oneAuthor = async (id) => {
 
 export const updateAuthor = async (id, authors, config) => {
     try {
-        const response = await apiFecth.put(`/Authors/${id}`, authors, config);
+        const response = await apiFecth.patch(`/Authors/${id}`, authors, config);
         return response.data;
     } catch (error) {
         throw error;

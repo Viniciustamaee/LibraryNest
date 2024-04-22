@@ -13,9 +13,10 @@ export class BooksController {
     private readonly cloudinaryService: CloudinaryService
   ) { }
 
+
   @Post()
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('img')) 
+  @UseInterceptors(FileInterceptor('img'))
   async create(@Body() body: CreateBookDto, @UploadedFile() file: Express.Multer.File) {
     const imgUrl = await this.cloudinaryService.uploadImage(file);
     const book = await this.booksService.create({ ...body, img: imgUrl });
@@ -34,8 +35,14 @@ export class BooksController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  update(@Param('id') id: string, @Body() data: UpdateBookDto) {
-    return this.booksService.update(+id, data);
+  @UseInterceptors(FileInterceptor('img'))
+  async update(@Param('id') id: string, @Body() data: UpdateBookDto, @UploadedFile() file?: Express.Multer.File) {
+    let imgUrl;
+    if (file) {
+      imgUrl = await this.cloudinaryService.uploadImage(file);
+    }
+
+    return this.booksService.update(+id, { ...data, img: imgUrl });
   }
 
   @Delete(':id')
@@ -46,10 +53,10 @@ export class BooksController {
 
 
   @Post('teste')
-  @UseInterceptors(FileInterceptor('img')) 
+  @UseInterceptors(FileInterceptor('img'))
   async teste(@UploadedFile() img: Express.Multer.File) {
     const imgUrl = await this.cloudinaryService.uploadImage(img);
     return { imgUrl };
   }
-  
+
 }

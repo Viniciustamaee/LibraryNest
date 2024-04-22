@@ -23,7 +23,6 @@ export class RentEntity {
     @JoinColumn({ name: 'user_id' })
     user: UserEntity
 
-
     @ManyToOne(() => BookEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'book_id' })
     book: BookEntity

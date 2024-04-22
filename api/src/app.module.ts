@@ -49,7 +49,7 @@ import { ConfigModule } from '@nestjs/config';
         ReviewEntity,
         UserEntity
       ],
-      synchronize: false,
+      synchronize: true,
     })],
 
   controllers: [AppController],

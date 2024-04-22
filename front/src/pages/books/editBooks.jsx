@@ -80,35 +80,36 @@ export default function newBooks() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasToken = localStorage.getItem('token');
-    
+
         try {
             setIsSubmitting(true);
-            
+
             const formDataObject = new FormData();
-            formDataObject.append('title', formData.title);
-            formDataObject.append('quantity_available', parseInt(formData.quantity_available));
-            formDataObject.append('description', formData.description);
+            formDataObject.append('title', books.title);
+            formDataObject.append('quantity_available', parseInt(books.quantity_available));
+            formDataObject.append('description', books.description);
             formDataObject.append('img', imageUrl);
-            formDataObject.append('author_id', parseInt(formData.author_id));
-            formDataObject.append('category_id', parseInt(formData.category_id));
-    
-            await updateBook(id, formData, {
+            formDataObject.append('author', parseInt(books.author.id));
+            formDataObject.append('category', parseInt(books.category.id));
+
+            await updateBook(id, formDataObject, {
                 headers: {
                     'Authorization': `Bearer ${hasToken}`,
                 },
             });
-    
+
             notifySucess();
             navigate('/books/allbooks');
-    
+
         } catch (error) {
+
             console.error('Error calling API:', error.message);
             notifyFail();
         } finally {
             setIsSubmitting(false);
         }
     };
-    
+
     const notifySucess = () => {
         toast.success("Succss edit", {
             position: "bottom-right",

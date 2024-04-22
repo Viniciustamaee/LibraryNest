@@ -14,9 +14,7 @@ export class CreateBookDto {
     @IsString()
     description: string;
 
-    @IsNotEmpty()
     category_id: number;
 
-    @IsNotEmpty()
     author_id: number;
 }
