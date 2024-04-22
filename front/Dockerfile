@@ -8,4 +8,4 @@ WORKDIR /usr/scr/app/front
 
 EXPOSE 8000
 
-CMD [ "npm","start" ]
+CMD [ "npm","start"]

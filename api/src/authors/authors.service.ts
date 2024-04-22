@@ -20,17 +20,14 @@ export class AuthorsService {
         name
       }
     })
-
     if (existingAuthor) {
       return "Exist the author"
     }
-
-
     const newAuthor = await this.authorRepository.create({ name });
     return await this.authorRepository.save(newAuthor);
   }
 
-  
+
   async findAll() {
     const allAuthor = await this.authorRepository.find()
     return allAuthor;
@@ -44,7 +41,7 @@ export class AuthorsService {
       throw new NotFoundException(`Author with ID ${id} not found`);
     }
 
-    const oneAuthor = await this.authorRepository.findBy({ id })
+    const oneAuthor = await this.authorRepository.findOne({ where: { id } })
     return oneAuthor;
   }
 
@@ -58,7 +55,7 @@ export class AuthorsService {
 
     await this.authorRepository.update(id, { name });
 
-    const updatedAuthor = await this.authorRepository.findBy({ id });
+    const updatedAuthor = await this.authorRepository.findOne({ where: { id } });
 
     return updatedAuthor;
   }

@@ -4,7 +4,9 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
     name: 'authors'
 })
 export class AuthorEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        type: "int"
+    })
     id: number;
 
     @Column({
