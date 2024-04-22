@@ -18,7 +18,7 @@ export class CloudinaryService {
     if (!img || !img.buffer) {
       
 
-      return img = "https://static.wikia.nocookie.net/naruto/images/3/33/Naruto_Uzumaki_%28Parte_I_-_HD%29.png/revision/latest/scale-to-width-down/1200?cb=20160316113315&path-prefix=pt-br"
+      return img = process.env.IMG_DEFAULT
     }
 
     const imgBase64 = img.buffer.toString('base64'); 
