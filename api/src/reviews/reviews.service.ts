@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { BooksService } from 'src/books/books.service';
 import { UsersService } from 'src/users/users.service';
 
+
 @Injectable()
 export class ReviewsService {
 
@@ -36,38 +37,38 @@ export class ReviewsService {
 
   async findAll() {
     const allReviews = await this.reviewsRepository.find({ relations: ['book', 'user'] })
-
     return allReviews
   }
 
+
   async findOne(id: number) {
+    const allReviews = await this.reviewsRepository.find({ relations: ['book', 'user'] });
 
-    const existingReview = await this.existing(id);
+    const reviewsWithMatchingBookId = allReviews.filter(review => review.book.id === id);
 
-    if (!existingReview) {
-      throw new NotFoundException(`Review with ID ${id} not found`);
+    if (reviewsWithMatchingBookId.length === 0) {
+        throw new NotFoundException(`No reviews found for book with ID ${id}`);
     }
 
-
-    const oneReview = await this.reviewsRepository.findOne({ where: { id }, relations: ['book', 'user'] })
-
-
-    return oneReview;
-  }
+    return reviewsWithMatchingBookId;
+}
 
 
   async remove(id: number) {
-    const existingReview = await this.existing(id);
-
+    const existingReview = await this.reviewsRepository.findOne({
+      where: { id },
+      relations: ['book']
+    });
+  
     if (!existingReview) {
       throw new NotFoundException(`Review with ID ${id} not found`);
     }
-
-    const deleteBook = await this.reviewsRepository.delete({ id })
-
+  
+    const deleteBook = await this.reviewsRepository.delete({ id });
+  
     return deleteBook;
-
   }
+  
 
 
   existing(id: number) {

@@ -16,7 +16,9 @@ export class CloudinaryService {
 
   async uploadImage(img: any): Promise<string> {
     if (!img || !img.buffer) {
-     return img = "https://res.cloudinary.com/dtuxy5k7v/image/upload/v1710514781/vector-flat-illustration-grayscale-avatar-600nw-2281862025_grjznc.jpg";
+      
+
+      return img = "https://static.wikia.nocookie.net/naruto/images/3/33/Naruto_Uzumaki_%28Parte_I_-_HD%29.png/revision/latest/scale-to-width-down/1200?cb=20160316113315&path-prefix=pt-br"
     }
 
     const imgBase64 = img.buffer.toString('base64'); 

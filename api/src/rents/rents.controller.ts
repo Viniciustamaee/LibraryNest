@@ -9,7 +9,6 @@ export class RentsController {
   constructor(private readonly rentsService: RentsService) { }
 
   @Post()
-  @UseGuards(AuthGuard)
   create(@Body() { book_id, due_date, rented_date, user_id }: CreateRentDto) {
     return this.rentsService.create({ book_id, due_date, rented_date, user_id });
   }
@@ -22,6 +21,11 @@ export class RentsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.rentsService.findOne(+id);
+  }
+
+  @Get(':id/one')
+  findOneRents(@Param('id') id: string){
+    return this.rentsService.findOneRents(+id)
   }
 
   @Patch(':id')

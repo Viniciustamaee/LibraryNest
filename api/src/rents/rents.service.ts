@@ -6,6 +6,8 @@ import { RentEntity } from './entities/rent.entity';
 import { Repository } from 'typeorm';
 import { BooksService } from 'src/books/books.service';
 import { UsersService } from 'src/users/users.service';
+import { chownSync } from 'fs';
+import { Console } from 'console';
 
 @Injectable()
 export class RentsService {
@@ -21,7 +23,6 @@ export class RentsService {
   async create({ due_date, book_id, rented_date, user_id }: CreateRentDto) {
     const book = await this.booksService.existing(book_id);
     const user = await this.userService.existing(user_id);
-    
 
     if (!book) {
       throw new NotFoundException(`Book with ID ${book_id} not found`);
@@ -51,21 +52,36 @@ export class RentsService {
 
   async findAll() {
     const allRents = await this.rentsRepository.find({ relations: ['book', 'user'] })
-
     return allRents;
   }
 
   async findOne(id: number) {
-    const existingRents = await this.existing(id)
-
-    if (!existingRents) {
-      throw new NotFoundException(`Rents with ID ${id} not found`);
+    const allRents = await this.rentsRepository.find({ relations: ['book', 'user'] })
+    const rentsWithMatchingBookId = allRents.filter(rents => rents.user.id === id);
+    
+    if (rentsWithMatchingBookId.length == 0) {
+        throw new NotFoundException(`No reviews found for book with ID ${id}`);
     }
 
-    const oneRents = await this.rentsRepository.findOne({ where: { id }})
+    return rentsWithMatchingBookId;
 
-    return oneRents;
+  }
 
+
+  async findOneRents(id: number){
+    const existingRents = await this.existing(id)
+
+
+    if (!existingRents) {
+      throw new NotFoundException(`Author with ID ${id} not found`);
+    }
+
+    const oneAuthor = await this.rentsRepository.find({
+      where: { id },
+      relations: ['book', 'user']
+  });
+  
+    return oneAuthor;
   }
 
   async update(id: number, data: UpdateRentDto) {
@@ -89,10 +105,13 @@ export class RentsService {
     if (showRents.book.quantity_available > 0) {
       showRents.book.quantity_available += 1;
       await this.booksService.update(showRents.book.id, { quantity_available: showRents.book.quantity_available });
-
+      
     } else {
       throw new BadRequestException(`Book with ID ${showRents.book.id} is not available for rent`);
     }
+
+    await this.rentsRepository.delete({ id });
+  
 
     return { message: `Rent with ID ${id} successfully deleted and book quantity updated` };
   }

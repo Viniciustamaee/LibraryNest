@@ -25,7 +25,6 @@ export class ReviewsController {
 
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.reviewsService.remove(+id);
   }

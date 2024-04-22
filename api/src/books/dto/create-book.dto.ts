@@ -6,7 +6,6 @@ export class CreateBookDto {
     @IsNotEmpty()
     title: string;
 
-    @IsInt()
     @IsNotEmpty()
     quantity_available: number;
 
@@ -15,11 +14,9 @@ export class CreateBookDto {
     @IsString()
     description: string;
 
-    @IsInt()
     @IsNotEmpty()
     category_id: number;
 
-    @IsInt()
     @IsNotEmpty()
     author_id: number;
 }

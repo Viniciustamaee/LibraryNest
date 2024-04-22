@@ -18,13 +18,14 @@ export class BooksService {
     ) { }
 
   async create({ category_id, author_id, description, img, quantity_available, title }: CreateBookDto) {
+    
     const existingBook = await this.bookRepository.findOne({
       where: { title }
     });
-
+    
     await this.authorService.findOne(author_id)
     await this.categoryService.findOne(category_id)
-
+    
     if (existingBook) {
       return "The book with the same title already exists";
     }
@@ -81,6 +82,7 @@ export class BooksService {
     if (!existingBooks) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
+    
 
     const deleteBook = await this.bookRepository.delete({ id })
 

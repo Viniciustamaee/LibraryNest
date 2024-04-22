@@ -3,9 +3,6 @@ import { IsInt, IsNotEmpty, Min, Max, IsString } from "class-validator";
 export class CreateReviewDto {
 
     @IsInt()
-    @IsNotEmpty()
-    @Min(1)
-    @Max(5)
     rating: number;
 
     @IsString()

@@ -1,11 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { Multer } from 'multer'; // Importe Multer diretamente
 import { FileInterceptor } from '@nestjs/platform-express';
+import { BooksService } from './books.service';
 
 @Controller('books')
 export class BooksController {
@@ -16,7 +15,7 @@ export class BooksController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('img')) // Interceptador para o campo 'img' do corpo da requisição
+  @UseInterceptors(FileInterceptor('img')) 
   async create(@Body() body: CreateBookDto, @UploadedFile() file: Express.Multer.File) {
     const imgUrl = await this.cloudinaryService.uploadImage(file);
     const book = await this.booksService.create({ ...body, img: imgUrl });
