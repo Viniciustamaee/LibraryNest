@@ -47,8 +47,9 @@ export default function GrupoButton({ urlLink, quantity }) {
         rented_date: rentedDate,
         due_date: dueDate,
         user_id: userData.id,
-        book_id: id
+        book_id: parseInt(id)
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();

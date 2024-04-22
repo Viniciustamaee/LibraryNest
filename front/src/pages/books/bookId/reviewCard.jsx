@@ -7,11 +7,12 @@ export default function Review({ comment, rating, id, idUrl, idReview }) {
     const adminObject = JSON.parse(adminData);
     const [users, setUsers] = useState([]);
 
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await allUsers(id);
-                const filteredUsers = response.filter(user => user.id === id);
+                const filteredUsers = response.filter(user => user.id == id);
                 setUsers(filteredUsers);
             } catch (error) {
                 console.error("Erro ao buscar os usuários:", error);
@@ -25,14 +26,13 @@ export default function Review({ comment, rating, id, idUrl, idReview }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasToken = localStorage.getItem('token');
-
+                
         try {
-            await deleteReview(idUrl, idReview, {
+            await deleteReview(idReview, {
                 headers: {
                     'Authorization': `Bearer ${hasToken}`,
                 },
             });
-
 
             window.location.href = `/Books/${idUrl}`;
 
@@ -41,7 +41,7 @@ export default function Review({ comment, rating, id, idUrl, idReview }) {
         }
     };
 
-    const isCurrentUserAuthor = users.some(user => user.id === adminObject.id);
+    const isCurrentUserAuthor = users.some(user => user.id == adminObject.id);
 
     const Stars = ({ rating }) => {
         const stars = [];

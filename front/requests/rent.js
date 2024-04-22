@@ -34,13 +34,14 @@ export const insertRent = async (dataForInsert, config) => {
         const response = await apiFecth.post(`/Rents`, dataForInsert, config);
         return response.data;
     } catch (error) {
+        console.log(error)
         throw error;
     }
 }
 
 export const updateRents = async (id, dataForInsert, config) => {
     try {
-        const response = await apiFecth.put(`/Rents/${id}`, dataForInsert, config);
+        const response = await apiFecth.patch(`/Rents/${id}`, dataForInsert, config);
         return response.data;
     } catch (error) {
         throw error;
@@ -49,7 +50,7 @@ export const updateRents = async (id, dataForInsert, config) => {
 
 export const dataOneRent = async (id) => {
     try {
-        const response = await apiFecth.get(`/Rents/${id}/Rents`);
+        const response = await apiFecth.get(`/Rents/${id}/one`);
         return response.data;
     } catch (error) {
         throw error;

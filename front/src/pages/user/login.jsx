@@ -40,15 +40,10 @@ const Login = () => {
         };
 
         try {
-            console.log('kjsdlkasdl')
             const response = await login(formData, config);
             const data = response;
 
             setIsSubmitting(true);
-
-            console.log(data.accessToken)
-            console.log(data.user)
-
 
             localStorage.setItem('token', data.accessToken);
             localStorage.setItem('user', JSON.stringify(data.user));

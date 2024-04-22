@@ -65,8 +65,6 @@ const Register = () => {
 
 
             if (imageUrl) {
-                console.log('entrou em imagUrl')
-                console.log(imageUrl)
                 formDataObject.append('img', imageUrl);
             } else {
                 formDataObject.append('img', '');

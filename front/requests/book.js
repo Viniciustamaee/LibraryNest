@@ -23,7 +23,7 @@ export const oneBook = async (id) => {
 
 export const updateBook = async (id, formDataObject, config) => {
     try {
-        const response = await apiFecth.put(`/Books/${id}`, formDataObject, config);
+        const response = await apiFecth.patch(`/Books/${id}`, formDataObject, config);
         return response.data;
     } catch {
         console.log(error)
@@ -31,15 +31,16 @@ export const updateBook = async (id, formDataObject, config) => {
     }
 }
 
-export const insertBooks = async (formDataObject, config) => {
+export const insertBooks = async (formData, config) => {
     try {
-        const response = await apiFecth.post(`/Books`, formDataObject, config);
-        return response.data;
-    } catch {
-        console.log(error)
+        const response = await apiFecth.post(`/Books`, formData, config);
+        return response.data; // Retorna os dados do livro inserido pela API
+    } catch (error) {
+        console.log(error);
         throw error;
     }
 }
+
 
 export const deleteBook = async (id, config) => {
     try {

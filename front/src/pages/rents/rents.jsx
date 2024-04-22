@@ -89,8 +89,8 @@ export default function Rents() {
                                         key={rents.id}
                                         rented_date={getStandardFormattedDateTime(rents.rented_date)}
                                         due_date={getStandardFormattedDateTime(rents.due_date)}
-                                        user_id={user.find(user => user.id === rents.user_id)?.username || "N/A"}
-                                        books_id={books.find(book => book.id === rents.book_id)?.title || "N/A"}
+                                        user_id={user.find(user => user.id == rents.user.id)?.username || "N/A"}
+                                        books_id={books.find(book => book.id == rents.book.id)?.title || "N/A"}
                                         id={rents.id} />
                                 ))}
                             </table>

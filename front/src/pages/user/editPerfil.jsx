@@ -84,10 +84,7 @@ export default function EditPerfil() {
                 notifyFail("Passwords do not match");
                 return;
             }
-
-            console.log(user.username)
-
-
+            
             await updateUser(id, formDataObject);
             navigate('/login');
             notifySuccess();

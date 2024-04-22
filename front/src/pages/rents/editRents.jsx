@@ -26,9 +26,10 @@ export default function EditRent() {
                 const rentData = response[0] ?? {};
                 setRent(rentData);
                 setOriginalDueDate(rentData.due_date);
+
                 if (response.length > 0) {
-                    const bookResponse = await oneBook(rentData.book_id);
-                    setBook(bookResponse[0] ?? {});
+                    const bookResponse = await oneBook(rentData.book.id);
+                    setBook(bookResponse ?? {});
                 }
             } catch (error) {
                 console.error("Error fetching rent data:", error);
@@ -39,15 +40,6 @@ export default function EditRent() {
             fetchRent();
         }
     }, [id]);
-
-
-
-    console.log('Rents')
-    console.log(rent.due_date)
-
-    console.log('Rents sem mudar')
-    console.log(originalDueDate.slice(0, 10))
-
 
     const handleSubmit = async (event) => {
         const hasToken = localStorage.getItem('token');

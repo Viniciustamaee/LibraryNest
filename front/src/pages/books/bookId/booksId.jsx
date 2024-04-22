@@ -8,7 +8,7 @@ import { Pagination } from 'flowbite-react';
 import Rating from '@mui/material/Rating';
 import { toast } from 'react-toastify';
 import Box from '@mui/material/Box';
-import Review from "./reviewCard"
+import Review from "./reviewCard";
 import * as React from 'react';
 
 export default function haha() {
@@ -24,8 +24,9 @@ export default function haha() {
 
     const [formData, setFormData] = useState({
         comment: '',
-        rating: '1',
+        rating: 1,
         user_id: adminObject.id,
+        book_id: parseInt(id)
     });
 
     const handleChange = (e) => {
@@ -38,8 +39,8 @@ export default function haha() {
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const response = await oneBook(id);
-                setBooks(response[0]);
+                const response = await oneBook(id)
+                setBooks(response);
             } catch (error) {
                 console.error("Error search book:", error);
             }
@@ -52,8 +53,11 @@ export default function haha() {
         e.preventDefault();
 
         const hasToken = localStorage.getItem('token');
+        const rating = parseInt(formData.rating);
+
+
         try {
-            await insertReview(id, formData, {
+            await insertReview(id, { ...formData, rating }, { 
                 headers: {
                     'Authorization': `Bearer ${hasToken}`,
                 },
@@ -76,7 +80,7 @@ export default function haha() {
                 window.location.href = redirectUrl;
             },
         });
-    };
+    };               
 
     const notifyFail = (error) => {
         toast.error(error.message, {
@@ -98,6 +102,7 @@ export default function haha() {
         const fectReview = async () => {
             try {
                 const response = await allReview(id);
+
                 setReview(response);
                 setTotalPages(Math.ceil(response.length / 3));
 
@@ -108,6 +113,8 @@ export default function haha() {
 
         fectReview();
     }, []);
+
+
 
     const indexOfLastAuthor = currentPage * 3;
     const indexOfFirstAuthor = indexOfLastAuthor - 3;
@@ -185,7 +192,7 @@ export default function haha() {
                     {currentReview.map((reviews) => (
                         <Review
                             key={reviews.id}
-                            id={reviews.user_id}
+                            id={reviews.user.id}
                             comment={reviews.comment}
                             rating={reviews.rating}
                             idUrl={id}

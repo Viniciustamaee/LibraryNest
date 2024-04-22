@@ -3,7 +3,7 @@ import apiFecth from "../axios/apiAxios";
 
 export const allUsers = async () => {
     try {
-        const response = await apiFecth.get(`/User`);
+        const response = await apiFecth.get(`/Users`);
         return response.data;
     } catch (error) {
         throw error;
@@ -22,7 +22,6 @@ export const oneUser = async (id) => {
 
 export const insertBook = async (formDataObject) => {
     try {
-        console.log(formDataObject)
         const response = await apiFecth.post(`/Users`, formDataObject);
         return response.data;
     } catch {

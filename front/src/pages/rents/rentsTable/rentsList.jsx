@@ -24,7 +24,7 @@ export default function RentsList({ rented_date, due_date, user_id, books_id, id
                     'Authorization': `Bearer ${hasToken}`,
                 },
             });
-
+            
             notifySuccess();
         } catch (error) {
             console.error('Error calling API:', error.message);

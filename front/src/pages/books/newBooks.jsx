@@ -71,11 +71,11 @@ export default function newBooks() {
             setIsSubmitting(true);
             const formDataObject = new FormData();
             formDataObject.append('title', formData.title);
-            formDataObject.append('quantity_available', formData.quantity_available);
+            formDataObject.append('quantity_available', parseInt(formData.quantity_available));
             formDataObject.append('description', formData.description);
             formDataObject.append('img', imageUrl);
-            formDataObject.append('author_id', formData.author_id);
-            formDataObject.append('category_id', formData.category_id);
+            formDataObject.append('author_id', parseInt(formData.author_id));
+            formDataObject.append('category_id', parseInt(formData.category_id));
 
             await insertBooks(formDataObject, {
                 headers: {

@@ -15,11 +15,19 @@ export default function newBooks() {
     const navigate = useNavigate();
     const { id } = useParams()
 
+    const [formData, setFormData] = useState({
+        title: '',
+        quantity_available: '',
+        description: '',
+        author_id: '',
+        category_id: ''
+    });
+
     useEffect(() => {
         const fectcBooks = async () => {
             try {
                 const response = await oneBook(id);
-                setBooks(response[0]);
+                setBooks(response);
             } catch (error) {
                 console.error("Error fetching categories:", error);
             }
@@ -72,32 +80,35 @@ export default function newBooks() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasToken = localStorage.getItem('token');
-
+    
         try {
             setIsSubmitting(true);
+            
             const formDataObject = new FormData();
-            formDataObject.append('title', books.title);
-            formDataObject.append('quantity_available', books.quantity_available);
-            formDataObject.append('description', books.description);
-            formDataObject.append('author_id', books.author_id);
-            formDataObject.append('category_id', books.category_id);
+            formDataObject.append('title', formData.title);
+            formDataObject.append('quantity_available', parseInt(formData.quantity_available));
+            formDataObject.append('description', formData.description);
             formDataObject.append('img', imageUrl);
-
-            await updateBook(id, formDataObject, {
+            formDataObject.append('author_id', parseInt(formData.author_id));
+            formDataObject.append('category_id', parseInt(formData.category_id));
+    
+            await updateBook(id, formData, {
                 headers: {
                     'Authorization': `Bearer ${hasToken}`,
                 },
             });
-
-            notifySucess()
-            navigate('/books/allbooks')
-
+    
+            notifySucess();
+            navigate('/books/allbooks');
+    
         } catch (error) {
             console.error('Error calling API:', error.message);
-            notifyFail()
+            notifyFail();
+        } finally {
+            setIsSubmitting(false);
         }
     };
-
+    
     const notifySucess = () => {
         toast.success("Succss edit", {
             position: "bottom-right",
