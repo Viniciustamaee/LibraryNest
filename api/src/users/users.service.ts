@@ -42,7 +42,7 @@ export class UsersService {
     const allBooks = await this.usersRepository.find()
     return allBooks;
   }
-  
+
 
   async findOne(id: number) {
 
@@ -53,7 +53,7 @@ export class UsersService {
     }
 
 
-    const oneUser = await this.usersRepository.findBy({ id })
+    const oneUser = await this.usersRepository.findOne({ where: { id } })
 
 
     return oneUser;
@@ -64,17 +64,17 @@ export class UsersService {
     if (!existingUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-  
+
     const hashedPassword = await bcrypt.hash(data.password, salts);
-  
+
     const updatedUserData = {
       ...data,
-      password: hashedPassword, 
+      password: hashedPassword,
     };
-  
+
     await this.usersRepository.update(id, updatedUserData);
-  
-    const updatedUser = await this.usersRepository.findBy({ id });
+
+    const updatedUser = await this.usersRepository.findOne({ where: { id } });
     return updatedUser;
   }
 

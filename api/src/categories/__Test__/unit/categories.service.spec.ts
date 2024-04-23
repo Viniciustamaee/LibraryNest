@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CreateCategoryDto } from '../../dto/create-category.dto';
+import { CategoryEntity } from '../../entities/category.entity';
 import { CategoriesService } from '../../categories.service';
-import { CreateCategoryDto } from 'src/categories/dto/create-category.dto';
-import { CategoryEntity } from 'src/categories/entities/category.entity';
+import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { validate } from 'class-validator';
 
 const mockCategoryRepository = {
     create: jest.fn(),
@@ -25,6 +26,27 @@ describe('CategoriesService', () => {
 
         service = module.get<CategoriesService>(CategoriesService);
     });
+
+    describe('DTO validation', () => {
+        it('should pass validation with a valid name', async () => {
+            const createCategoryDto = new CreateCategoryDto();
+            createCategoryDto.category_name = 'Terror';
+
+            const errors = await validate(createCategoryDto);
+
+            expect(errors.length).toEqual(0);
+        });
+
+        it('should fail validation with an empty name', async () => {
+            const createCategoryDTO = new CreateCategoryDto();
+            createCategoryDTO.category_name = '';
+
+            const errors = await validate(createCategoryDTO);
+
+            expect(errors.length).toBeGreaterThan(0);
+            expect(errors[0].constraints).toHaveProperty('isNotEmpty');
+        });
+    })
 
     describe('create', () => {
         it('Should create a new Category', async () => {
@@ -113,6 +135,23 @@ describe('CategoriesService', () => {
 
             await expect(service.update(invalidId, { category_name: 'Jane Doe' })).rejects.toThrow(NotFoundException);
         });
+    })
+
+    describe('remove', () => {
+        it('Should remove the CAtegory with the specified ID and Return the deletion information', async () => {
+            const existingCategory: CategoryEntity = { id: 1, category_name: 'terror' }
+
+            const deleteinfo = { affected: 1 };
+
+            mockCategoryRepository.findOne.mockResolvedValueOnce(existingCategory);
+
+            mockCategoryRepository.delete.mockResolvedValueOnce(deleteinfo);
+
+            const result = await service.remove(1)
+            expect(result).toEqual(deleteinfo)
+        });
+
+
     })
 
 });

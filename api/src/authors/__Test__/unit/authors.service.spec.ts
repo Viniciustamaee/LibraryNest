@@ -5,6 +5,7 @@ import { AuthorsService } from '../../authors.service';
 import { NotFoundException } from '@nestjs/common';
 import { validate } from 'class-validator';
 
+
 const mockAuthorRepository = {
     create: jest.fn(),
     save: jest.fn(),
@@ -72,6 +73,8 @@ describe('AuthorsService', () => {
             mockAuthorRepository.findOne.mockResolvedValueOnce({});
 
             const result = await service.create(createAuthorDto);
+
+            console.log(result)
 
             expect(result).toEqual('Exist the author');
         });
