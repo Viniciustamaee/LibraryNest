@@ -3,6 +3,7 @@ import { AuthorEntity } from '../../entities/author.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthorsService } from '../../authors.service';
 import { NotFoundException } from '@nestjs/common';
+import { validate } from 'class-validator';
 
 const mockAuthorRepository = {
     create: jest.fn(),
@@ -27,9 +28,32 @@ describe('AuthorsService', () => {
         service = module.get<AuthorsService>(AuthorsService);
     });
 
+
+    describe('DTO validation', () => {
+        it('should pass validation with a valid name', async () => {
+            const createAuthorDto = new CreateAuthorDto();
+            createAuthorDto.name = 'John';
+
+            const errors = await validate(createAuthorDto);
+
+            expect(errors.length).toEqual(0);
+        });
+
+        it('should fail validation with an empty name', async () => {
+            const createAuthorDto = new CreateAuthorDto();
+            createAuthorDto.name = '';
+
+            const errors = await validate(createAuthorDto);
+
+            expect(errors.length).toBeGreaterThan(0);
+            expect(errors[0].constraints).toHaveProperty('isNotEmpty');
+        });
+    })
+
     describe('create', () => {
         it('should create a new author', async () => {
-            const createAuthorDto: CreateAuthorDto = { name: '' };
+            const createAuthorDto: CreateAuthorDto = { name: 'bhads' };
+
             const mockAuthor: AuthorEntity = { id: 1, ...createAuthorDto };
 
 
@@ -87,9 +111,9 @@ describe('AuthorsService', () => {
 
         describe('update', () => {
             it('should update the author with the specified ID and return the updated author', async () => {
-                const existingAuthor: AuthorEntity = { id: 1, name: 'John Doe' };
+                const existingAuthor: AuthorEntity = { id: 1, name: 'Tamae' };
 
-                const updatedAuthor: AuthorEntity = { id: 1, name: 'Jane Doe' };
+                const updatedAuthor: AuthorEntity = { id: 1, name: 'Vincius' };
 
                 mockAuthorRepository.findOne.mockResolvedValueOnce(existingAuthor);
 
@@ -97,7 +121,7 @@ describe('AuthorsService', () => {
 
                 mockAuthorRepository.findOne.mockResolvedValueOnce(updatedAuthor);
 
-                const result = await service.update(1, { name: 'Jane Doe' });
+                const result = await service.update(1, { name: 'Vinicius' });
 
                 expect(result).toEqual(updatedAuthor);
             });
@@ -107,22 +131,18 @@ describe('AuthorsService', () => {
 
                 const invalidId = 999;
 
-                await expect(service.update(invalidId, { name: 'Jane Doe' })).rejects.toThrow(NotFoundException);
+                await expect(service.update(invalidId, { name: 'Vinicius' })).rejects.toThrow(NotFoundException);
             });
         });
 
         describe('remove', () => {
             it('should remove the author with the specified ID and return the deletion information', async () => {
-                // Mocking the existing author to be returned by the repository
-                const existingAuthor: AuthorEntity = { id: 1, name: 'John Doe' };
+                const existingAuthor: AuthorEntity = { id: 1, name: 'Vinicius' };
 
-                // Mocking the deletion information
-                const deleteInfo = { affected: 1 }; // Assuming one record is affected
+                const deleteInfo = { affected: 1 };
 
-                // Mocking the repository method to return the existing author
                 mockAuthorRepository.findOne.mockResolvedValueOnce(existingAuthor);
 
-                // Mocking the repository method to delete the author
                 mockAuthorRepository.delete.mockResolvedValueOnce(deleteInfo);
                 const result = await service.remove(1);
                 expect(result).toEqual(deleteInfo);
