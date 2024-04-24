@@ -4,6 +4,7 @@ import { CategoriesService } from '../../categories.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { validate } from 'class-validator';
+import { faker } from '@faker-js/faker';
 
 const mockCategoryRepository = {
     create: jest.fn(),
@@ -102,9 +103,8 @@ describe('CategoriesService', () => {
 
         it('Should throw NotFoundException if category with the specified ID is not found', async () => {
             mockCategoryRepository.findOne.mockResolvedValueOnce(null);
-            const invalidId = 999;
 
-            await expect(service.findOne(invalidId)).rejects.toThrow(NotFoundException);
+            await expect(service.findOne(faker.number.int())).rejects.toThrow(NotFoundException);
         });
     });
 

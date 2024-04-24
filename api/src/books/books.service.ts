@@ -4,8 +4,8 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { BookEntity } from './entities/book.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthorsService } from 'src/authors/authors.service';
-import { CategoriesService } from 'src/categories/categories.service';
+import { CategoriesService } from '../categories/categories.service';
+import { AuthorsService } from '../authors/authors.service';
 
 @Injectable()
 export class BooksService {
