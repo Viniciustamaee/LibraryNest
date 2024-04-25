@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReviewEntity } from './entities/review.entity';
 import { Repository } from 'typeorm';
-import { BooksService } from 'src/books/books.service';
-import { UsersService } from 'src/users/users.service';
+import { BooksService } from '../books/books.service';
+import { UsersService } from '../users/users.service';
+
+
 
 
 @Injectable()
@@ -22,8 +23,6 @@ export class ReviewsService {
 
     await this.userService.findOne(user_id)
     await this.bookService.findOne(book_id)
-
-
 
     const newReview = this.reviewsRepository.create({
       rating,
@@ -47,11 +46,11 @@ export class ReviewsService {
     const reviewsWithMatchingBookId = allReviews.filter(review => review.book.id === id);
 
     if (reviewsWithMatchingBookId.length === 0) {
-        throw new NotFoundException(`No reviews found for book with ID ${id}`);
+      throw new NotFoundException(`No reviews found for book with ID ${id}`);
     }
 
     return reviewsWithMatchingBookId;
-}
+  }
 
 
   async remove(id: number) {
@@ -59,16 +58,16 @@ export class ReviewsService {
       where: { id },
       relations: ['book']
     });
-  
+
     if (!existingReview) {
       throw new NotFoundException(`Review with ID ${id} not found`);
     }
-  
+
     const deleteBook = await this.reviewsRepository.delete({ id });
-  
+
     return deleteBook;
   }
-  
+
 
 
   existing(id: number) {

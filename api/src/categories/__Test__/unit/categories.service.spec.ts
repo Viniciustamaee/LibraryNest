@@ -138,7 +138,7 @@ describe('CategoriesService', () => {
     })
 
     describe('remove', () => {
-        it('Should remove the CAtegory with the specified ID and Return the deletion information', async () => {
+        it('Should remove the Category with the specified ID and Return the deletion information', async () => {
             const existingCategory: CategoryEntity = { id: 1, category_name: 'terror' }
 
             const deleteinfo = { affected: 1 };

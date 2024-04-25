@@ -4,10 +4,9 @@ import { UpdateRentDto } from './dto/update-rent.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RentEntity } from './entities/rent.entity';
 import { Repository } from 'typeorm';
-import { BooksService } from 'src/books/books.service';
-import { UsersService } from 'src/users/users.service';
-import { chownSync } from 'fs';
-import { Console } from 'console';
+import { BooksService } from '../books/books.service';
+import { UsersService } from '../users/users.service';
+
 
 @Injectable()
 export class RentsService {
@@ -57,10 +56,10 @@ export class RentsService {
 
   async findOne(id: number) {
     const allRents = await this.rentsRepository.find({ relations: ['book', 'user'] })
-    const rentsWithMatchingBookId = allRents.filter(rents => rents.user.id === id);
-    
+    const rentsWithMatchingBookId = allRents.filter(rents => rents.user.id == id);
+
     if (rentsWithMatchingBookId.length == 0) {
-        throw new NotFoundException(`No reviews found for book with ID ${id}`);
+      throw new NotFoundException(`No reviews found for book with ID ${id}`);
     }
 
     return rentsWithMatchingBookId;
@@ -68,7 +67,7 @@ export class RentsService {
   }
 
 
-  async findOneRents(id: number){
+  async findOneRents(id: number) {
     const existingRents = await this.existing(id)
 
 
@@ -79,8 +78,8 @@ export class RentsService {
     const oneAuthor = await this.rentsRepository.find({
       where: { id },
       relations: ['book', 'user']
-  });
-  
+    });
+
     return oneAuthor;
   }
 
@@ -105,13 +104,13 @@ export class RentsService {
     if (showRents.book.quantity_available > 0) {
       showRents.book.quantity_available += 1;
       await this.booksService.update(showRents.book.id, { quantity_available: showRents.book.quantity_available });
-      
+
     } else {
       throw new BadRequestException(`Book with ID ${showRents.book.id} is not available for rent`);
     }
 
     await this.rentsRepository.delete({ id });
-  
+
 
     return { message: `Rent with ID ${id} successfully deleted and book quantity updated` };
   }

@@ -6,7 +6,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from '../../books.service';
 import { faker } from '@faker-js/faker';
 import { NotFoundException } from '@nestjs/common';
-import { mock } from 'node:test';
 
 
 const mockBookRepository = {
@@ -83,11 +82,12 @@ describe('BooksService', () => {
 
             expect(result).toEqual(mockBook);
         });
-        it('Should return "Exist the author" if category already exists', async () => {
+        it('Should return "Exist the Book" if category already exists', async () => {
             const data: CreateBookDto = {
                 title: faker.person.firstName(),
                 img: faker.image.url(),
-                author_id: 1, category_id: 1,
+                author_id: 1,
+                category_id: 1,
                 description: faker.lorem.text(),
                 quantity_available: faker.number.int()
             };
@@ -177,9 +177,9 @@ describe('BooksService', () => {
                 category: { id: 1, category_name: faker.person.firstName() },
                 description: faker.lorem.text(),
                 quantity_available: faker.number.int()
-            }
+            };
 
-            const Newdata: BookEntity = {
+            const newData: BookEntity = {
                 id: 1,
                 title: 'novo',
                 img: faker.image.url(),
@@ -187,25 +187,55 @@ describe('BooksService', () => {
                 category: { id: 1, category_name: faker.person.firstName() },
                 description: faker.lorem.text(),
                 quantity_available: faker.number.int()
+            };
+
+            mockBookRepository.findOne.mockResolvedValueOnce(data);
+            mockBookRepository.update.mockResolvedValueOnce(newData);
+
+
+            const result = await service.update(1, { title: 'novo' });
+
+            expect(result).toEqual(newData);
+
+        });
+
+        it('should throw NotFoundException if category with the specified ID is not found', async () => {
+            mockBookRepository.findOne.mockResolvedValueOnce(null);
+
+            await expect(service.update(faker.number.int(), { title: faker.person.firstName() })).rejects.toThrow(NotFoundException);
+        });
+    });
+
+    describe('remove', () => {
+        it('Should remove the Book with the specified ID and Return the deletion information', async () => {
+            const data: BookEntity = {
+                id: 1,
+                title: faker.person.firstName(),
+                img: faker.image.url(),
+                author: { id: 1, name: faker.person.firstName() },
+                category: { id: 1, category_name: faker.person.firstName() },
+                description: faker.lorem.text(),
+                quantity_available: faker.number.int()
             }
+
+            const deleteinfo = { affected: 1 };
 
             mockBookRepository.findOne.mockResolvedValueOnce(data);
 
-            mockBookRepository.update.mockResolvedValueOnce({});
+            mockBookRepository.delete.mockResolvedValueOnce(deleteinfo);
 
-            mockBookRepository.findOne.mockResolvedValueOnce(Newdata);
+            const result = await service.remove(1)
+            expect(result).toEqual(deleteinfo)
+        });
 
-            const result = await service.update(1, {
-                title: 'novo',
-                img: faker.image.url(),
-                author_id: 1,
-                category_id: 1,
-                description: faker.lorem.text(),
-                quantity_available: faker.number.int()
-            });
+        it('should throw NotFoundException if book with the specified ID is not found', async () => {
+            mockBookRepository.findOne.mockResolvedValueOnce(null);
 
-            expect(result).toEqual(data);
+            await expect(service.remove(faker.number.int())).rejects.toThrow(NotFoundException);
+        });
 
-        })
+
     })
+
+
 });

@@ -1,11 +1,13 @@
-import { IsDate, IsNotEmpty, IsNumber } from "class-validator";
+import { IsDate, IsDateString, IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateRentDto {
 
     @IsNotEmpty()
+    @IsDateString()
     rented_date: string;
 
     @IsNotEmpty()
+    @IsDateString()
     due_date: string;
 
     @IsNumber()
