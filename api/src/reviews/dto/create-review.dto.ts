@@ -3,6 +3,7 @@ import { IsInt, IsNotEmpty, Min, Max, IsString } from "class-validator";
 export class CreateReviewDto {
 
     @IsInt()
+    @IsNotEmpty()
     rating: number;
 
     @IsString()

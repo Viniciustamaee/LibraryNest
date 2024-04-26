@@ -1,4 +1,4 @@
-import { IsDate, IsDateString, IsNotEmpty, IsNumber } from "class-validator";
+import { IsDateString, IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateRentDto {
 

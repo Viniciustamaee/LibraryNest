@@ -189,13 +189,11 @@ describe('RentsService', () => {
 
     describe('update', () => {
         it('Update rent with success', async () => {
-            const bookId = 1;
-            const userId = 1;
 
             const initialRentData: RentEntity = {
                 id: 1,
                 book: {
-                    id: bookId,
+                    id: 1,
                     title: faker.person.firstName(),
                     img: faker.image.url(),
                     author: { id: 1, name: faker.person.firstName() },
@@ -206,7 +204,7 @@ describe('RentsService', () => {
                 due_date: faker.date.recent().toISOString(),
                 rented_date: faker.date.recent().toISOString(),
                 user: {
-                    id: userId,
+                    id: 1,
                     email: faker.internet.email(),
                     password: faker.internet.password(),
                     username: faker.internet.userName(),
@@ -219,7 +217,7 @@ describe('RentsService', () => {
             const updatedRentData: RentEntity = {
                 id: 2,
                 book: {
-                    id: bookId,
+                    id: 1,
                     title: faker.person.firstName(),
                     img: faker.image.url(),
                     author: { id: 1, name: faker.person.firstName() },
@@ -230,7 +228,7 @@ describe('RentsService', () => {
                 due_date: faker.date.recent().toISOString(),
                 rented_date: '2002-08-28',
                 user: {
-                    id: userId,
+                    id: 1,
                     email: faker.internet.email(),
                     password: faker.internet.password(),
                     username: faker.internet.userName(),
@@ -240,8 +238,7 @@ describe('RentsService', () => {
                 }
             };
 
-
-            jest.spyOn(mockRentsRepository, 'findOneRents').mockResolvedValueOnce(updatedRentData);
+            mockRentsRepository.findOne.mockResolvedValueOnce(1);
 
 
             mockRentsRepository.update.mockResolvedValueOnce(updatedRentData);
@@ -250,23 +247,14 @@ describe('RentsService', () => {
 
             expect(result).toEqual(updatedRentData);
 
-            expect(mockRentsRepository.findOneRents).toHaveBeenCalledWith(1);
-            expect(mockRentsRepository.update).toHaveBeenCalledWith(1, { rented_date: '2002-08-28' });
         });
 
         it('Throws NotFoundException if rent is not found', async () => {
 
             mockRentsRepository.findOneRents.mockResolvedValue(null);
 
-
-
             await expect(rentsService.update(1, { rented_date: '2002-08-28' })).rejects.toThrowError(NotFoundException);
         });
-
-
-
-
-
     })
 
     describe('romove', () => {

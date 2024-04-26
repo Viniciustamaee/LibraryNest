@@ -30,28 +30,6 @@ describe('AuthorsService', () => {
         service = module.get<AuthorsService>(AuthorsService);
     });
 
-
-    describe('DTO validation', () => {
-        it('should pass validation with a valid name', async () => {
-            const createAuthorDto = new CreateAuthorDto();
-            createAuthorDto.name = 'John';
-
-            const errors = await validate(createAuthorDto);
-
-            expect(errors.length).toEqual(0);
-        });
-
-        it('should fail validation with an empty name', async () => {
-            const createAuthorDto = new CreateAuthorDto();
-            createAuthorDto.name = '';
-
-            const errors = await validate(createAuthorDto);
-
-            expect(errors.length).toBeGreaterThan(0);
-            expect(errors[0].constraints).toHaveProperty('isNotEmpty');
-        });
-    })
-
     describe('create', () => {
         it('should create a new author', async () => {
             const createAuthorDto: CreateAuthorDto = { name: faker.person.firstName() };

@@ -1,10 +1,11 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "src/users/entities/user.entity";
 import { Repository } from "typeorm";
 import * as bcrypt from 'bcrypt';
-
+import { UserEntity } from "../users/entities/user.entity";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 
 
@@ -19,8 +20,10 @@ export class AuthService {
 
     async createToken() {
         const payload = { expiresIn: '7 days' };
-        const accessToken = this.jwtService.sign(payload);
-        return { accessToken }; 
+        const secretKey = process.env.JWT_SECRET;
+        const accessToken = this.jwtService.sign(payload, { secret: secretKey });
+
+        return { accessToken };
     }
 
     async login(password: string, username: string) {
@@ -43,10 +46,10 @@ export class AuthService {
     async checkToken(token: string) {
         try {
             const decodedToken = this.jwtService.verify(token);
-            return decodedToken; 
+            return decodedToken;
         } catch (error) {
             throw new UnauthorizedException('Invalid token');
         }
     }
-    
+
 }

@@ -8,20 +8,20 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-
 @Module({
     imports: [
         JwtModule.register({
             secret: process.env.JWT_SECRET
         }),
         UsersModule,
-        TypeOrmModule.forFeature([UserEntity]) 
+        TypeOrmModule.forFeature([UserEntity])
 
-        ],
+    ],
     controllers: [authController],
-    providers: [AuthService]
+    providers: [AuthService],
+    exports: [AuthModule]
 })
 
 export class AuthModule {
-    
+
 }
