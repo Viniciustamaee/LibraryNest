@@ -1,0 +1,140 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserEntity {
+  id: ID!
+  email: String!
+  username: String!
+  password: String!
+  img: String!
+  description: String!
+  admin: Float!
+}
+
+type CategoryEntity {
+  id: ID!
+  category_name: String!
+}
+
+type AuthorEntity {
+  id: ID!
+  name: String!
+}
+
+type BookEntity {
+  id: ID!
+  title: String!
+  quantity_available: Float!
+  img: String!
+  description: String!
+  category: CategoryEntity!
+  author: AuthorEntity!
+}
+
+type CategoryType {
+  id: ID!
+  category_name: String!
+}
+
+type RentEntity {
+  id: ID!
+  rented_date: String!
+  due_date: String!
+  user: UserEntity!
+  book: BookEntity!
+}
+
+type ReviewEntity {
+  id: ID!
+  rating: Float!
+  comment: String
+  user: UserEntity!
+  book: BookEntity!
+}
+
+type AuthPayload {
+  accessToken: String!
+  user: UserEntity!
+}
+
+type Query {
+  users: [UserEntity!]!
+  user(id: Int!): UserEntity!
+  books: [BookEntity!]!
+  book(id: Float!): BookEntity!
+  author: [AuthorEntity!]!
+  authorOne(id: Int!): AuthorEntity!
+  categories: [CategoryType!]!
+  category(id: Int!): CategoryType!
+  rents: [RentEntity!]!
+  rent(id: String!): RentEntity!
+  rentOne(id: String!): RentEntity!
+  reviews: [ReviewEntity!]!
+  reviewsByBookId(id: String!): [ReviewEntity!]!
+}
+
+type Mutation {
+  createUser(data: CreateUsersInput!): UserEntity!
+  updateUser(id: Int!, updateUserInput: CreateUsersInput!): UserEntity!
+  removeUser(id: Int!): UserEntity!
+  createBook(data: inputBook!): BookEntity!
+  updateBook(id: String!, input: inputBook!): BookEntity!
+  removeBook(id: String!): BookEntity!
+  createAuthor(createAuthorInput: createAuthorInputs!): AuthorEntity!
+  updateAuthor(id: Int!, updateAuthorInput: createAuthorInputs!): AuthorEntity!
+  removeAuthor(id: Int!): AuthorEntity!
+  createCategory(data: CreateCategoryInput!): CategoryType!
+  updateCategory(id: Int!, category: CreateCategoryInput!): CategoryType!
+  removeCategory(id: Int!): CategoryType!
+  createRent(input: InputtRents!): RentEntity!
+  updateRent(id: String!, input: InputtRents!): RentEntity!
+  deleteRent(id: String!): RentEntity!
+  createReview(data: InputReview!): ReviewEntity!
+  deleteReview(id: String!): ReviewEntity!
+  login(input: AuthLoginDTO!): AuthPayload!
+}
+
+input CreateUsersInput {
+  email: String!
+  username: String!
+  password: String!
+  img: String!
+  description: String!
+}
+
+input inputBook {
+  title: String!
+  quantity_available: Float!
+  img: String!
+  description: String!
+  category_id: Float!
+  author_id: Float!
+}
+
+input createAuthorInputs {
+  name: String!
+}
+
+input CreateCategoryInput {
+  category_name: String!
+}
+
+input InputtRents {
+  rented_date: String!
+  due_date: String!
+  user_id: Float!
+  book_id: Float!
+}
+
+input InputReview {
+  rating: Float!
+  comment: String
+  user_id: Float!
+  book_id: Float!
+}
+
+input AuthLoginDTO {
+  username: String!
+  password: String!
+}

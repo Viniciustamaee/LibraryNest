@@ -1,10 +1,10 @@
-import { CreateAuthorDto } from '../../dto/create-author.dto';
-import { AuthorEntity } from '../../entities/author.entity';
+import { CreateAuthorDto } from '../../inputs/create-author.dto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthorsService } from '../../authors.service';
 import { NotFoundException } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { faker } from '@faker-js/faker';
+import { AuthorEntity } from 'src/authors/entity/authors.entity';
 
 
 const mockAuthorRepository = {
@@ -53,7 +53,6 @@ describe('AuthorsService', () => {
 
             const result = await service.create(createAuthorDto);
 
-            console.log(result)
 
             expect(result).toEqual('Exist the author');
         });

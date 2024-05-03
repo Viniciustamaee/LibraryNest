@@ -1,15 +1,17 @@
-import { updateRents, dataOneRent } from '../../../requests/rent';
 import { useParams, useNavigate } from "react-router-dom";
-import { oneBook } from "../../../requests/book";
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import "./rents.css"
+import { useMutation, useQuery } from "@apollo/client";
+import { ONE_RENT_DATA, UPDATE_RENTS } from "../../../requests/rent";
+import { ONE_BOOK_QUERY } from "../../../requests/book";
 
 export default function EditRent() {
     const [originalDueDate, setOriginalDueDate] = useState('');
 
-    const [rent, setRent] = useState({ due_date: '' });
-    const [book, setBook] = useState({ title: '' });
+
+    const [rent, setRent] = useState({ due_date: '', book: '' });
+    const [book, setBook] = useState({ title: '', id: '' });
 
     const User = localStorage.getItem('user');
     const userData = JSON.parse(User);
@@ -17,29 +19,43 @@ export default function EditRent() {
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const { loading, error, data, refetch } = useQuery(ONE_RENT_DATA, {
+        variables: { id }
+    });
+
+    const { loading: loadingBook, error: errorBook, data: dataBook, refetch: refetchBook } = useQuery(ONE_BOOK_QUERY, {
+        variables: { id: parseFloat(rent.book.id) }
+    });
 
 
     useEffect(() => {
         const fetchRent = async () => {
             try {
-                const response = await dataOneRent(id);
-                const rentData = response[0] ?? {};
-                setRent(rentData);
-                setOriginalDueDate(rentData.due_date);
+                if (data && data.rentOne) {
+                    const rentData = data.rentOne;
+                    setRent(rentData);
+                    setOriginalDueDate(rentData.due_date);
 
-                if (response.length > 0) {
-                    const bookResponse = await oneBook(rentData.book.id);
-                    setBook(bookResponse ?? {});
+                    if (dataBook && dataBook.book) {
+                        const bookData = dataBook.book;
+                        setBook({
+                            title: bookData.title,
+                            id: bookData.id
+                        });
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching rent data:", error);
             }
         };
 
-        if (id) {
-            fetchRent();
-        }
-    }, [id]);
+        fetchRent();
+
+    }, [data, dataBook]);
+
+    const [updateRentMutation, { loading: updatingRent }] = useMutation(UPDATE_RENTS);
+
+
 
     const handleSubmit = async (event) => {
         const hasToken = localStorage.getItem('token');
@@ -49,20 +65,29 @@ export default function EditRent() {
                 return notifyFail('Due date cannot be earlier than the original due date')
             }
 
-            await updateRents(id, rent, {
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`
+            const { data } = await updateRentMutation({
+                variables: {
+                    id: id,
+                    input: {
+                        user_id: parseInt(userData.id),
+                        book_id: parseFloat(book.id),
+                        rented_date: rent.rented_date,
+                        due_date: rent.due_date
+                    }
                 }
             });
-            notifySucess()
-            navigate(`/rents/allrents`);
 
+            if (data && data.updateRent) {
+                notifySucess();
+                navigate(`/rents/allrents`);
+            } else {
+                notifyFail("Edit failed");
+            }
         } catch (error) {
             notifyFail("Edit fail")
             console.error('Error updating rent:', error);
         }
     };
-
 
     const notifySucess = () => {
         toast.success("Succss edit", {

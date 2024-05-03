@@ -1,12 +1,13 @@
-import { allBooksCover } from "../../../requests/book";
 import React, { useEffect, useState } from "react";
-import { allUsers } from "../../../requests/user";
-import { oneRent } from "../../../requests/rent";
 import RentsList from './rentsTable/rentsList'
 import RentsHead from './rentsTable/rentsHead'
 import { useParams } from "react-router-dom";
 import { Pagination } from 'flowbite-react';
 import { format } from 'date-fns';
+import { ALL_BOOKS_QUERY } from "../../../requests/book";
+import { ALL_USER } from "../../../requests/user";
+import { useQuery } from "@apollo/client";
+import { ONE_RENT } from "../../../requests/rent";
 
 export default function Rents() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,48 +21,60 @@ export default function Rents() {
     const onPageChange = (page) => setCurrentPage(page);
     const { id } = useParams()
 
+    const { loading: loadingUser, error: errorUser, data: dataUser, refetch: refetchUser } = useQuery(ALL_USER);
+    const { loading: loadingBook, error: errorBook, data: dataBook, refetch: refetchBook } = useQuery(ALL_BOOKS_QUERY);
+    const { loading, error, data } = useQuery(ONE_RENT, {
+        variables: { id: id }
+    });
+
 
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const response = await allBooksCover();
-                setBooks(response);
+                if (dataBook && dataBook.books) {
+                    setBooks(dataBook.books);
+                }
             } catch (error) {
-                console.error("Erro search book:", error);
+                console.error("Error searching for users:", error);
             }
         };
 
         fetchBooks();
-    }, []);
+    }, [dataBook]);
+
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                if (dataUser && dataUser.users) {
+                    setUser(dataUser.users);
+                }
+            } catch (error) {
+                console.error("Error searching for users:", error);
+            }
+        };
+
+        fetchUser();
+    }, [dataUser]);
+
 
 
     useEffect(() => {
         const fetchRents = async () => {
             try {
-                const response = await allUsers();
-                setUser(response);
-                setTotalPages(Math.ceil(response.length / 5));
+                if (data && data.rent) {
+                    setRents(Array.isArray(data.rent) ? data.rent : [data.rent]);
+                } else {
+                    setRents([]);
+                }
             } catch (error) {
-                console.error("Erro search rents:", error);
+                console.error("Erro ao buscar aluguel:", error);
             }
         };
 
         fetchRents();
-    }, []);
+    }, [data]);
 
-    useEffect(() => {
-        const fetchRents = async () => {
-            try {
-                const response = await oneRent(id);
-                setRents(response);
-                setTotalPages(Math.ceil(response.length / 5));
-            } catch (error) {
-                console.error("Erro search rents:", error);
-            }
-        };
-
-        fetchRents();
-    }, []);
 
     function getStandardFormattedDateTime(dateTimeString) {
         const datePart = dateTimeString.split('T')[0];
@@ -72,6 +85,8 @@ export default function Rents() {
     const indexOfLastAuthor = currentPage * 5;
     const indexOfFirstAuthor = indexOfLastAuthor - 5;
     const currentRents = rents.slice(indexOfFirstAuthor, indexOfLastAuthor);
+
+
     return (
         <>
             {userData.id == id ? <div>
@@ -84,15 +99,17 @@ export default function Rents() {
                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <RentsHead />
-                                {currentRents.map((rents) => (
+                                {currentRents.map((rent) => (
                                     <RentsList
-                                        key={rents.id}
-                                        rented_date={getStandardFormattedDateTime(rents.rented_date)}
-                                        due_date={getStandardFormattedDateTime(rents.due_date)}
-                                        user_id={user.find(user => user.id == rents.user.id)?.username || "N/A"}
-                                        books_id={books.find(book => book.id == rents.book.id)?.title || "N/A"}
-                                        id={rents.id} />
+                                        key={rent.id}
+                                        rented_date={getStandardFormattedDateTime(rent.rented_date)}
+                                        due_date={getStandardFormattedDateTime(rent.due_date)}
+                                        user_id={user.find(user => user.id == rent.user.id)?.username || "N/A"}
+                                        books_id={books.find(book => book.id == rent.book.id)?.title || "N/A"}
+                                        id={rent.id}
+                                    />
                                 ))}
+
                             </table>
                         </div>
                     </div>}

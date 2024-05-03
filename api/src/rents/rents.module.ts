@@ -1,17 +1,18 @@
 import { Module } from '@nestjs/common';
 import { RentsService } from './rents.service';
-import { RentsController } from './rents.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RentEntity } from './entities/rent.entity';
+import { RentEntity } from './entity/rent.entity';
 import { BooksModule } from 'src/books/books.module';
 import { UsersModule } from 'src/users/users.module';
+import { RentsResolver } from '../graphQL/rents/resolver/rents.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([RentEntity]),
     BooksModule,
     UsersModule
   ],
-  controllers: [RentsController],
-  providers: [RentsService],
+  providers: [RentsService,
+    RentsResolver
+  ],
 })
 export class RentsModule { }

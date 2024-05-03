@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -15,14 +15,17 @@ export class CloudinaryService {
   }
 
   async uploadImage(img: any): Promise<string> {
-    if (!img || !img.buffer) {
-      
 
+    if (typeof img == "string") {
+      return img
+    }
+
+    if (!img || !img.buffer) {
       return img = process.env.IMG_DEFAULT
     }
 
-    const imgBase64 = img.buffer.toString('base64'); 
-    const result = await cloudinary.uploader.upload(`data:${img.mimetype};base64,${imgBase64}`); 
+    const imgBase64 = img.buffer.toString('base64');
+    const result = await cloudinary.uploader.upload(`data:${img.mimetype};base64,${imgBase64}`);
 
     if (!result || !result.secure_url) {
       throw new Error('Failed to upload image to Cloudinary');

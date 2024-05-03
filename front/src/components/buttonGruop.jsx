@@ -1,14 +1,16 @@
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { useParams, useNavigate } from 'react-router-dom';
-import { insertRent } from "../../requests/rent";
-import { deleteBook } from "../../requests/book";
+import { INSERT_RENT } from "../../requests/rent";
+import {  delete_book } from "../../requests/book";
 import { Button, Modal } from 'flowbite-react';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom"
 import { toast } from 'react-toastify';
+import { useMutation } from '@apollo/client';
 
 
 export default function GrupoButton({ urlLink, quantity }) {
+    const [deleteBook, { loading: updatingRent }] = useMutation(delete_book);
     const [openModal, setOpenModal] = useState(false);
     const adminData = localStorage.getItem('user');
     const adminObject = JSON.parse(adminData);
@@ -43,28 +45,32 @@ export default function GrupoButton({ urlLink, quantity }) {
         return dateFuture;
     };
 
-    const dataForInsert = {
-        rented_date: rentedDate,
-        due_date: dueDate,
-        user_id: userData.id,
-        book_id: parseInt(id)
-    };
-    
+
+    const [insertRentMutation, { loading: insertingRent }] = useMutation(INSERT_RENT);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasToken = localStorage.getItem('token');
 
         try {
-            await insertRent(dataForInsert, {
-                withCredentials: true,
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`,
-                },
-            });
 
-            notifySucess("Rent made");
+            if (quantity > 0) {
+                await insertRentMutation({
+                    variables: {
+                        input: {
+                            rented_date: rentedDate,
+                            due_date: dueDate,
+                            book_id: parseFloat(id),
+                            user_id: parseFloat(userData.id)
+                        }
+                    }
+                });
+                return notifySucess("Rent made");
+            }
+
+            return notifyFail()
+
 
         } catch (error) {
             notifyFail()
@@ -74,22 +80,18 @@ export default function GrupoButton({ urlLink, quantity }) {
 
     const deleteBooks = async (e) => {
         e.preventDefault();
-        const hasToken = localStorage.getItem('token');
-
         try {
-            await deleteBook(id, {
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`,
-                },
+            await deleteBook({
+                variables: {
+                    id,
+                }
             });
-
 
             notifySucess('Book delete with success');
             navigate(`/books`)
         } catch (error) {
             console.error('Error calling API:', error.message);
             setIsSubmitting(true);
-            notifyFail(error.message)
         }
     };
 
@@ -107,7 +109,6 @@ export default function GrupoButton({ urlLink, quantity }) {
             autoClose: 1000,
 
         });
-
     };
 
     return (
@@ -134,7 +135,7 @@ export default function GrupoButton({ urlLink, quantity }) {
                         <button
                             type="button"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b  border-l border-r border-gray-400 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white  rounded-lg"
-                            onClick={quantity === 0 ? notifyFail : handleSubmit}
+                            onClick={quantity == 0 ? notifyFail : handleSubmit}
                         >
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19V4c0-.6.4-1 1-1h12c.6 0 1 .4 1 1v13H7a2 2 0 0 0-2 2Zm0 0c0 1.1.9 2 2 2h12M9 3v14m7 0v4" />

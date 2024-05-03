@@ -1,10 +1,11 @@
-import { allBooksCover } from "../../../requests/book";
 import React, { useEffect, useState } from "react";
-import { allRents } from "../../../requests/rent";
-import { allUsers } from "../../../requests/user";
 import RentsList from './rentsTable/rentsList'
 import RentsHead from './rentsTable/rentsHead'
 import { Pagination } from 'flowbite-react';
+import { ALL_RENTS } from "../../../requests/rent";
+import { useQuery } from "@apollo/client";
+import { ALL_USER } from "../../../requests/user";
+import { ALL_BOOKS_QUERY } from "../../../requests/book";
 
 export default function allRentsAdmin() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,47 +16,54 @@ export default function allRentsAdmin() {
     const [user, setUser] = useState([]);
     const userData = JSON.parse(User);
 
+    const { loading, error, data, refetch } = useQuery(ALL_RENTS);
+    const { loading: loadingUser, error: errorUser, data: dataUser, refetch: refetchUser } = useQuery(ALL_USER);
+    const { loading: loadingBook, error: errorBook, data: dataBook, refetch: refetchBook } = useQuery(ALL_BOOKS_QUERY);
+
+
     const onPageChange = (page) => setCurrentPage(page);
 
     useEffect(() => {
         const fetchRents = async () => {
             try {
-                const response = await allRents();
-                setRents(response);
-                setTotalPages(Math.ceil(response.length / 5));
+                if (data && data.rents) {
+                    setRents(data.rents);
+                }
             } catch (error) {
-                console.error("Erro search rents:", error);
+                console.error("Error searching for books:", error);
             }
         };
 
         fetchRents();
-    }, []);
+    }, [data]);
 
     useEffect(() => {
-        const fetchRents = async () => {
+        const fetchUser = async () => {
             try {
-                const response = await allUsers();
-                setUser(response);
+                if (dataUser && dataUser.users) {
+                    setUser(dataUser.users);
+                }
             } catch (error) {
-                console.error("Erro search users:", error);
+                console.error("Error searching for users:", error);
             }
         };
 
-        fetchRents();
-    }, []);
+        fetchUser();
+    }, [dataUser]);
 
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const response = await allBooksCover();
-                setBooks(response);
+                if (dataBook && dataBook.books) {
+                    setBooks(dataBook.books);
+                }
             } catch (error) {
-                console.error("Erro search book:", error);
+                console.error("Error searching for users:", error);
             }
         };
 
         fetchBooks();
-    }, []);
+    }, [dataBook]);
 
 
     function getStandardFormattedDateTime(dateTimeString) {

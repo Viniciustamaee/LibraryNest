@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateAuthorDto } from './dto/create-author.dto';
-import { UpdateAuthorDto } from './dto/update-author.dto';
-import { AuthorEntity } from './entities/author.entity';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
+import { createAuthorInputs } from 'src/graphQL/auhtors/input/category.input';
 import { Repository } from 'typeorm';
+import { AuthorEntity } from './entity/authors.entity';
 
 
 @Injectable()
@@ -14,15 +14,14 @@ export class AuthorsService {
     private authorRepository: Repository<AuthorEntity>
   ) { }
 
-  async create({ name }: CreateAuthorDto) {
+  async create({ name }: createAuthorInputs) {
     const existingAuthor = await this.authorRepository.findOne({
       where: {
         name
       }
     })
     if (existingAuthor) {
-      return "Exist the author"
-    }
+      throw new ConflictException("Author already exists");    }
     const newAuthor = await this.authorRepository.create({ name });
     return await this.authorRepository.save(newAuthor);
   }
@@ -45,7 +44,7 @@ export class AuthorsService {
     return oneAuthor;
   }
 
-  async update(id: number, { name }: UpdateAuthorDto) {
+  async update(id: number, { name }: createAuthorInputs) {
 
     const existingAuthor = await this.existing(id)
 
@@ -60,19 +59,18 @@ export class AuthorsService {
     return updatedAuthor;
   }
 
-
-  async remove(id: number) {
-
-    const existingAuthor = await this.existing(id)
+  async remove(id: number): Promise<AuthorEntity> {
+    const existingAuthor = await this.existing(id);
 
     if (!existingAuthor) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+        throw new NotFoundException(`Author with ID ${id} not found`);
     }
 
-    const deleteAuthor = await this.authorRepository.delete({ id })
+    await this.authorRepository.delete({ id });
 
-    return deleteAuthor;
-  }
+    return existingAuthor; // Retorna o objeto do autor excluído
+}
+
 
 
   existing(id: number) {

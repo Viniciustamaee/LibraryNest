@@ -1,36 +1,48 @@
-import { deleteReview } from "../../../../requests/review";
-import { allUsers } from "../../../../requests/user";
+import { useMutation, useQuery } from "@apollo/client";
+import { DELETE_REVIEW } from "../../../../requests/review";
 import React, { useEffect, useState } from "react";
+import { ALL_USER } from "../../../../requests/user";
 
 export default function Review({ comment, rating, id, idUrl, idReview }) {
     const adminData = localStorage.getItem('user');
     const adminObject = JSON.parse(adminData);
     const [users, setUsers] = useState([]);
 
+    const { loading: loadingUser, error: errorUser, data: dataUser, refetch: refetchUser } = useQuery(ALL_USER);
+
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchUser = async () => {
             try {
-                const response = await allUsers(id);
-                const filteredUsers = response.filter(user => user.id == id);
-                setUsers(filteredUsers);
+                if (dataUser && dataUser.users) {
+                    const filteredUsers = dataUser.users.filter(user => user.id == id);
+                    setUsers(filteredUsers);
+                }
             } catch (error) {
-                console.error("Erro ao buscar os usuários:", error);
+                console.error("Error searching for users:", error);
             }
         };
 
-        fetchUsers();
-    }, [id]);
+        fetchUser();
+    }, [dataUser]);
+
+
+    const [deleteReview, { loading: updatingRent }] = useMutation(DELETE_REVIEW);
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasToken = localStorage.getItem('token');
-                
+
         try {
-            await deleteReview(idReview, {
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`,
+            await deleteReview({
+                variables: {
+                    id: idReview,
+                },
+                context: {
+                    headers: {
+                        'Authorization': `Bearer ${hasToken}`,
+                    },
                 },
             });
 

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { RentEntity } from "../../entities/rent.entity";
-import { CreateRentDto } from "../../dto/create-rent.dto";
+import { RentEntity } from "../../entity/rent.entity";
+import { CreateRentDto } from "../../../graphQL/rents/inputs/create-rent.dto";
 import { faker } from "@faker-js/faker";
 import { RentsService } from "../../rents.service";
 import { BooksService } from "../../../books/books.service";

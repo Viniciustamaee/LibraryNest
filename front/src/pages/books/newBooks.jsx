@@ -1,12 +1,20 @@
-import { allCategories } from "../../../requests/categories";
-import { allAuthors } from "../../../requests/author";
-import { insertBooks } from "../../../requests/book";
 import React, { useEffect, useState } from "react";
 import { Label, Select } from 'flowbite-react';
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import { useMutation, useQuery } from "@apollo/client";
+import { ALL_AUTHORS_QUERY } from "../../../requests/author";
+import { ALl_CATEGORY } from "../../../requests/categories";
+import { ALL_BOOKS_QUERY, INSERT_BOOK } from "../../../requests/book";
+import { imgForUrl } from "../../../requests/cloud";
+
 
 export default function newBooks() {
+    const [insertBook] = useMutation(INSERT_BOOK);
+
+    const { loading: loadingCategory, error: errorCategory, data: dataCateogry } = useQuery(ALl_CATEGORY);
+    const { loading, error, data } = useQuery(ALL_AUTHORS_QUERY);
+    const { loading: loginBook, error: errorBook, data: dataBook } = useQuery(ALL_BOOKS_QUERY);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [categories, setCategories] = useState([]);
     const [imageUrl, setImageUrl] = useState('');
@@ -18,7 +26,8 @@ export default function newBooks() {
         quantity_available: '',
         description: '',
         author_id: '',
-        category_id: ''
+        category_id: '',
+        img: ''
     });
 
     const handleChange = (e) => {
@@ -36,66 +45,45 @@ export default function newBooks() {
         }
     };
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await allCategories();
-                setCategories(response);
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            }
-        };
-
-        fetchCategories();
-    }, []);
-
-
-    useEffect(() => {
-        const fetchAuthors = async () => {
-            try {
-                const response = await allAuthors();
-                setAuthors(response);
-            } catch (error) {
-                console.error("Error fetching authors:", error);
-            }
-        };
-
-        fetchAuthors();
-    }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const hasToken = localStorage.getItem('token');
+        setIsSubmitting(true);
+
+        const formDataObject = new FormData();
+        formDataObject.append('img', imageUrl);
+
+        const img = await imgForUrl(formDataObject)
+
 
         try {
-            setIsSubmitting(true);
-            const formDataObject = new FormData();
-            formDataObject.append('title', formData.title);
-            formDataObject.append('quantity_available', parseInt(formData.quantity_available));
-            formDataObject.append('description', formData.description);
-            formDataObject.append('img', imageUrl);
-            formDataObject.append('author_id', parseInt(formData.author_id));
-            formDataObject.append('category_id', parseInt(formData.category_id));
+            formData.quantity_available = parseInt(formData.quantity_available);
+            formData.category_id = parseInt(formData.category_id);
+            formData.author_id = parseInt(formData.author_id);
+            formData.img = img
 
-            await insertBooks(formDataObject, {
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`,
+            await insertBook({
+                variables: {
+                    data: formData,
                 },
+                refetchQueries: [{ query: ALL_BOOKS_QUERY }]
             });
 
-            notifySucess()
+
             navigate('/books/allbooks')
+            notifySucess();
         } catch (error) {
-            notifyFail()
-            console.error('Error calling API:', error.message);
+            notifyFail();
+            console.error('Error calling API:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
+
 
     const notifySucess = () => {
         toast.success("Book insert with success", {
             position: "bottom-right",
             autoClose: 1000,
-
         });
     };
 
@@ -105,6 +93,34 @@ export default function newBooks() {
             autoClose: 1000,
         });
     };
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                if (dataCateogry && dataCateogry.categories) {
+                    setCategories(dataCateogry.categories);
+                }
+            } catch (error) {
+                console.error("Error searching for books:", error);
+            }
+        };
+
+        fetchBooks();
+    }, [dataCateogry]);
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                if (data && data.author) {
+                    setAuthors(data.author);
+                }
+            } catch (error) {
+                console.error("Error searching for books:", error);
+            }
+        };
+
+        fetchBooks();
+    }, [data]);
 
     return (
         <div className="flex items-center justify-center mt-10">
@@ -140,7 +156,6 @@ export default function newBooks() {
                                 <option key={category.id} value={category.id}>{category.category_name}</option>
                             ))}
                         </Select>
-
                     </div>
 
                     <div className="max-w-md">
@@ -149,8 +164,8 @@ export default function newBooks() {
                         </div>
                         <Select id="author_id" required onChange={handleChange} value={formData.author_id}>
                             <option value="" disabled>Choose the author</option>
-                            {authors.map((authors) => (
-                                <option key={authors.id} value={authors.id} >{authors.name}</option>
+                            {authors.map((author) => (
+                                <option key={author.id} value={author.id}>{author.name}</option>
                             ))}
                         </Select>
                     </div>

@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReviewsService } from '../../reviews.service';
-import { ReviewEntity } from '../../entities/review.entity';
+import { ReviewEntity } from '../../types/review.entity';
 import { BooksService } from '../../../books/books.service';
 import { UsersService } from '../../../users/users.service';
 import { CategoriesService } from '../../../categories/categories.service';
 import { AuthorsService } from '../../../authors/authors.service';
 import { NotFoundException } from '@nestjs/common';
-import { CreateReviewDto } from '../../dto/create-review.dto';
+import { CreateReviewDto } from '../../input/create-review.dto';
 import { faker } from '@faker-js/faker';
 
 const mockReviewsRepository = {

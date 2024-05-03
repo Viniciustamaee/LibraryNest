@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { BooksService } from './books.service';
-import { BooksController } from './books.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BookEntity } from './entities/book.entity';
 import { AuthorsModule } from '../authors/authors.module';
 import { CategoriesModule } from '../categories/categories.module';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
-
+import { BookEntity } from './entity/books.entity';
+import { BookResolver } from 'src/graphQL/book/resolver/book.resolver';
 
 @Module({
   imports: [
@@ -15,8 +14,7 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
     CategoriesModule,
     CloudinaryModule
   ],
-  controllers: [BooksController],
-  providers: [BooksService],
+  providers: [BooksService, BookResolver],
   exports: [BooksService]
 })
 export class BooksModule { }

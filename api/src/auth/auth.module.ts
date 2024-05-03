@@ -2,10 +2,10 @@ import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { UsersModule } from "src/users/users.module";
 import { AuthService } from "./auth.service";
-import { authController } from "./auth.controller";
-import { UserEntity } from "src/users/entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as dotenv from 'dotenv';
+import { AuthResolver } from "../graphQL/auth/resolver/auth.resolver";
+import { UserEntity } from "src/users/entity/users.entity";
 dotenv.config();
 
 @Module({
@@ -17,8 +17,8 @@ dotenv.config();
         TypeOrmModule.forFeature([UserEntity])
 
     ],
-    controllers: [authController],
-    providers: [AuthService],
+    providers: [AuthService, 
+        AuthResolver],
     exports: [AuthModule]
 })
 

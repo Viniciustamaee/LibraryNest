@@ -1,42 +1,43 @@
-import { allBooksCover } from "../../../requests/book";
-import { allUsers } from "../../../requests/user";
 import React, { useEffect, useState } from "react";
-
 import "../books/books.css";
+import { ALL_BOOKS_QUERY } from "../../../requests/book";
+import { useQuery } from "@apollo/client";
+import { ALL_USER } from "../../../requests/user";
 
 export default function Allbooks() {
     const [books, setBooks] = useState([]);
     const [user, setUser] = useState([]);
 
+    const { loading, error, data, refetch } = useQuery(ALL_BOOKS_QUERY);
+    const { loading: loadingUser, error: errorUser, data: dataUser, refetch: refetchUser } = useQuery(ALL_USER);
+
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const response = await allBooksCover();
-                setBooks(response);
-
+                if (data && data.books) {
+                    setBooks(data.books);
+                }
             } catch (error) {
-                console.error("Erro search book:", error);
-
+                console.error("Error searching for books:", error);
             }
         };
 
         fetchBooks();
-    }, []);
+    }, [data]);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await allUsers();
-                setUser(response);
+                if (dataUser && dataUser.users) {
+                    setUser(dataUser.users);
+                }
             } catch (error) {
-                console.error("Erro search user:", error);
+                console.error("Error searching for users:", error);
             }
         };
 
         fetchUser();
-    }, []);
-
-
+    }, [dataUser]);
 
     return (
         <>
@@ -49,7 +50,6 @@ export default function Allbooks() {
                             </p>
                         </div>
                         <img src={import.meta.env.VITE_IMG_BOOK} alt="" className="h-64 rounded-lg sm:h-auto" />
-
                     </div>
                 </div>
 
@@ -60,14 +60,14 @@ export default function Allbooks() {
                     </div>
                     <div id="dadeUser">
                         <h1 className="mr-5 text-3xl mb-2" style={{ color: '#fca311' }}>Number of Users</h1>
-                        <h2 className="text-center">{user.length}</h2>
+                        <h2 className="text-center">{loadingUser ? 'Loading...' : user.length}</h2>
                     </div>
                     <div id="dadeBooks">
                         <h1 className="mr-5 text-3xl mb-2" style={{ color: '#fca311' }}>Number of Books</h1>
-                        <h2 className="text-center">{books.length}</h2>
+                        <h2 className="text-center">{loading ? 'Loading...' : books.length}</h2>
                     </div>
                 </div>
             </div>
         </>
-    )
+    );
 }

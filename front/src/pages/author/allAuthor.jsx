@@ -1,31 +1,27 @@
 import AuthorHeads from "./components/headTable";
-import { allAuthors } from "../../../requests/author";
+import { ALL_AUTHORS_QUERY } from "../../../requests/author";
 import AuthorList from "./components/authorlist";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Pagination } from 'flowbite-react';
+import { useQuery } from "@apollo/client";
 
 export default function AllAuthors() {
-    const [authors, setAuthors] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+
+    const { loading, error, data } = useQuery(ALL_AUTHORS_QUERY);
 
     const onPageChange = (page) => setCurrentPage(page);
 
-    useEffect(() => {
-        const fetchAuthors = async () => {
-            try {
-                const response = await allAuthors();
-                setAuthors(response);
-                setTotalPages(Math.ceil(response.length / 5));
-            } catch (error) {
-                console.error("Erro ao buscar os livros:", error);
-            }
-        };
 
-        fetchAuthors();
-    }, []);
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error.message}</p>;
+  
 
+    const authors = data.author;
+
+
+    const totalPages = Math.ceil(authors.length / 5);
     const indexOfLastAuthor = currentPage * 5;
     const indexOfFirstAuthor = indexOfLastAuthor - 5;
     const currentAuthors = authors.slice(indexOfFirstAuthor, indexOfLastAuthor);

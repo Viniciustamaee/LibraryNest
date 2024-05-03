@@ -1,14 +1,18 @@
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
-import { insertBook } from '../../../requests/user';
+import { INSERT_USER } from '../../../requests/user';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useMutation } from '@apollo/client';
+import { imgForUrl } from '../../../requests/cloud';
 
 const Register = () => {
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const [showPassword, setShowPassword] = React.useState(false);
+    const [insertUserMutation] = useMutation(INSERT_USER);
+
     const navigate = useNavigate();
 
     const [imageUrl, setImageUrl] = useState('');
@@ -20,6 +24,7 @@ const Register = () => {
         description: ''
 
     });
+
     const handleChange = (e) => {
 
         setFormData({
@@ -34,6 +39,7 @@ const Register = () => {
 
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
+
         if (file) {
             setImageUrl(file);
         }
@@ -52,38 +58,43 @@ const Register = () => {
             return;
         }
 
+
+
+
+
+
+
         try {
+
+
             const formDataObject = new FormData();
-            formDataObject.append('email', formData.email);
-            formDataObject.append('username', formData.username);
-            formDataObject.append('description', formData.description);
+            formDataObject.append('img', imageUrl);
 
-            if (formData.password !== formData.passwordConfirm) {
-                return notifyFail("Password is not the same")
-            }
-            formDataObject.append('password', formData.password);
+            const img = await imgForUrl(formDataObject)
 
-
-            if (imageUrl) {
-                formDataObject.append('img', imageUrl);
-            } else {
-                formDataObject.append('img', '');
-            }
-
-
-            await insertBook(formDataObject);
+            await insertUserMutation({
+                variables: {
+                    data: {
+                        email: formData.email,
+                        username: formData.username,
+                        password: formData.password,
+                        description: formData.description,
+                        img: img
+                    },
+                }
+            })
 
             notifySucess();
-            navigate('/login')
+            navigate('/login');
 
         } catch (error) {
-            notifyFail("Username and Email already exists")
+            notifyFail("Username and Email already exists");
             console.error('Error calling API:', error);
-        
-
         }
     };
 
+
+    root
     const notifySucess = () => {
         toast.success("Create user", {
             position: "bottom-right",

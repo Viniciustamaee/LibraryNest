@@ -1,5 +1,5 @@
-import { CreateCategoryDto } from '../../dto/create-category.dto';
-import { CategoryEntity } from '../../entities/category.entity';
+import { CreateCategoryDto } from '../../inputs/create-category.dto';
+import { CategoryEntity } from '../../types/category.entity';
 import { CategoriesService } from '../../categories.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';

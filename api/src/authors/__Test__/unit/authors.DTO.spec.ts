@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { CreateAuthorDto } from '../../dto/create-author.dto';
+import { CreateAuthorDto } from '../../inputs/create-author.dto';
 import { validate } from 'class-validator';
 
 describe('DTO validation', () => {

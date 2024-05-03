@@ -1,46 +1,75 @@
-import apiFecth from "../axios/apiAxios";
+import { gql } from '@apollo/client';
 
-export const allAuthors = async () => {
-    try {
-        const response = await apiFecth.get(`/Authors`);
-        return response.data;
-    } catch (error) {
-        throw error;
+export const ALL_AUTHORS_QUERY = gql`
+query {
+    author {
+      id
+      name
     }
-}
+  }
+  
+`;
 
-export const deleteAuhtor = async (id, config) => {
-    try {
-        const response = await apiFecth.delete(`/Authors/${id}`, config);
-        return response.data;
-    } catch {
-        throw error;
-    }
-}
+export const DELETE_AUTHOR_MUTATION = gql`
+   mutation removeAuthor($id: Int!) {
+    removeAuthor(id: $id) {
+       id
+     }
+   }
+ `;
 
-export const oneAuthor = async (id) => {
-    try {
-        const response = await apiFecth.get(`/Authors/${id}`);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-}
 
-export const updateAuthor = async (id, authors, config) => {
-    try {
-        const response = await apiFecth.patch(`/Authors/${id}`, authors, config);
-        return response.data;
-    } catch (error) {
-        throw error;
+export const ONE_AUTHOR_QUERY = gql`
+query GetAuthor($id: Int!) {
+    authorOne(id: $id) {
+      id
+      name
     }
-}
+  }
+  
+`;
 
-export const insertAuthor = async (authors, config) => {
-    try {
-        const response = await apiFecth.post(`/Authors`, authors, config);
-        return response.data;
-    } catch (error) {
-        throw error;
+
+export const UPDATE_AUTHOR_MUTATION = gql`
+mutation UpdateAuthor($id: Int!, $updateAuthorInput: createAuthorInputs!) {
+    updateAuthor(id: $id, updateAuthorInput: $updateAuthorInput) {
+      id
+      name
     }
-}
+  }
+`;
+
+
+export const INSERT_AUTHOR_MUTATION = gql`
+mutation CreateAuthor($authorInput: createAuthorInputs!) {
+    createAuthor(createAuthorInput: $authorInput) {
+      id
+      name
+    }
+  }
+`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 
+
+
+
+
