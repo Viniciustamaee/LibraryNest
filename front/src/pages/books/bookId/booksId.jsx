@@ -1,8 +1,7 @@
-import { insertReview, allReview } from "../../../../requests/review";
+import { All_Review, INSER_REVIEW } from "../../../../requests/review";
 import GrupoButton from "../../../components/buttonGruop";
-import { oneBook } from "../../../../requests/book";
 import Typography from '@mui/material/Typography';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Pagination } from 'flowbite-react';
 import Rating from '@mui/material/Rating';
@@ -10,6 +9,8 @@ import { toast } from 'react-toastify';
 import Box from '@mui/material/Box';
 import Review from "./reviewCard";
 import * as React from 'react';
+import { useMutation, useQuery } from "@apollo/client";
+import { ONE_BOOK_QUERY } from "../../../../requests/book";
 
 export default function haha() {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,6 +21,7 @@ export default function haha() {
     const adminObject = JSON.parse(adminData);
     const [review, setReview] = useState([]);
     const [books, setBooks] = useState([]);
+    const navigate = useNavigate();
     const { id } = useParams()
 
     const [formData, setFormData] = useState({
@@ -27,6 +29,14 @@ export default function haha() {
         rating: 1,
         user_id: adminObject.id,
         book_id: parseInt(id)
+    });
+
+    const { loading, error, data: bookData } = useQuery(ONE_BOOK_QUERY, {
+        variables: { id: parseFloat(id) }
+    });
+
+    const { loading: loadingReview, error: errorReview, data: reviewData } = useQuery(All_Review, {
+        variables: { id: id }
     });
 
     const handleChange = (e) => {
@@ -37,34 +47,41 @@ export default function haha() {
     };
 
     useEffect(() => {
-        const fetchBooks = async () => {
-            try {
-                const response = await oneBook(id)
-                setBooks(response);
-            } catch (error) {
-                console.error("Error search book:", error);
-            }
-        };
+        if (bookData && bookData.book) {
+            setBooks(bookData.book)
+            setTotalPages(1);
+        }
+    }, [bookData]);
 
-        fetchBooks();
-    }, []);
+
+
+    const [createReview, { loading: insertReview }] = useMutation(INSER_REVIEW);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const hasToken = localStorage.getItem('token');
-        const rating = parseInt(formData.rating);
-
 
         try {
-            await insertReview(id, { ...formData, rating }, { 
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`,
+            await createReview({
+                variables: {
+                    data: {
+                        comment: formData.comment,
+                        rating: parseInt(formData.rating),
+                        user_id: parseInt(adminObject.id),
+                        book_id: parseInt(id)
+                    }
+                },
+                context: {
+                    headers: {
+                        'Authorization': `Bearer ${hasToken}`,
+                    },
                 },
             });
 
             setIsSubmitting(true);
-            notifySucess(`/Books/${id}`);
+            notifySucess();
 
         } catch (error) {
             console.error('Error calling API:', error.message);
@@ -72,15 +89,18 @@ export default function haha() {
         }
     };
 
-    const notifySucess = (redirectUrl) => {
+
+
+    const notifySucess = () => {
         toast.success("Comment Post", {
             position: "bottom-right",
             autoClose: 1000,
             onClose: () => {
-                window.location.href = redirectUrl;
+                window.location.href = `/Books/${id}`;
             },
         });
     };               
+
 
     const notifyFail = (error) => {
         toast.error(error.message, {
@@ -99,26 +119,22 @@ export default function haha() {
     };
 
     useEffect(() => {
-        const fectReview = async () => {
-            try {
-                const response = await allReview(id);
-
-                setReview(response);
-                setTotalPages(Math.ceil(response.length / 3));
-
-            } catch (error) {
-                console.error("Error search book:", error);
-            }
-        };
-
-        fectReview();
-    }, []);
+        if (reviewData && reviewData.reviewsByBookId) {
+            const reviews = reviewData.reviewsByBookId;
+            setReview(reviews);
+            setTotalPages(Math.ceil(reviews.length / 3));
+        }
+    }, [reviewData]);
 
 
 
-    const indexOfLastAuthor = currentPage * 3;
-    const indexOfFirstAuthor = indexOfLastAuthor - 3;
-    const currentReview = review.slice(indexOfFirstAuthor, indexOfLastAuthor);
+
+
+    if (loading || loadingReview) return <p>Loading...</p>;
+
+    const indexOfLastReview = currentPage * 3;
+    const indexOfFirstReview = indexOfLastReview - 3;
+    const currentReviews = review.slice(indexOfFirstReview, indexOfLastReview);
 
     return (
         <div className="flex justify-center mt-5">
@@ -189,7 +205,7 @@ export default function haha() {
                         </div>
                     </form>
 
-                    {currentReview.map((reviews) => (
+                    {currentReviews.map((reviews) => (
                         <Review
                             key={reviews.id}
                             id={reviews.user.id}

@@ -1,53 +1,91 @@
 import apiFecth from "../axios/apiAxios";
+import { gql } from '@apollo/client';
 
-export const allBooksCover = async () => {
-    try {
-        const response = await apiFecth.get(`/Books`);
-        return response.data;
-    } catch (error) {
-        console.log(error)
-        throw error;
+export const ALL_BOOKS_QUERY = gql`
+query {
+    books {
+      id
+      title
+      quantity_available
+      img
+      description
+      category {
+        id
+        category_name
+      }
+      author {
+        id
+        name
+      }
     }
+  }
+`;
+
+export const ONE_BOOK_QUERY = gql`
+query OneBook($id: Float!) {
+    book(id: $id) {
+      id
+      title
+      quantity_available
+      img
+      description
+      category {
+        id
+        category_name
+      }
+      author {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const UPDATE_BOOK = gql`
+  mutation UpdateBook($input: inputBook!, $id: String!) {
+    updateBook(input: $input, id: $id) {
+      id
+      title
+      quantity_available
+      description
+      img
+      category {
+        id
+      }
+      author {
+        id
+      }
+    }
+  }
+`;
+
+
+
+export const INSERT_BOOK = gql`
+mutation createBook($data: inputBook!) {
+  createBook(data: $data) {
+    id
+    title
+    quantity_available
+    description
+    img
+    category {
+      id
+    }
+    author {
+      id
+    }
+  }
+}
+`;
+
+export const delete_book = gql`
+mutation($id: String!) {
+  removeBook(id: $id) {
+    id
+  }
 }
 
-export const oneBook = async (id) => {
-    try {
-        const response = await apiFecth.get(`/Books/${id}`);
-        return response.data;
-    } catch (error) {
-        console.log(error)
-        throw error;
-    }
-}
+`
 
-
-export const updateBook = async (id, formDataObject, config) => {
-    try {
-        const response = await apiFecth.patch(`/Books/${id}`, formDataObject, config);
-        return response.data;
-    } catch {
-        console.log(error)
-        throw error;
-    }
-}
-
-export const insertBooks = async (formData, config) => {
-    try {
-        const response = await apiFecth.post(`/Books`, formData, config);
-        return response.data;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-}
-
-
-export const deleteBook = async (id, config) => {
-    try {
-        const response = await apiFecth.delete(`/Books/${id}`, config);
-        return response.data;
-    } catch {
-        throw error;
-    }
-}
 

@@ -1,10 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { CreateUsersInput } from 'src/graphQL/users/input/user.input';
+import { UserEntity } from './entity/users.entity';
 const salts = 5 //env
 
 @Injectable()
@@ -15,13 +14,13 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>
   ) { }
 
-  async create({ email, username, description, password, img }: CreateUserDto) {
+  async create({ email, username, description, password, img }) {
     const existingUser = await this.usersRepository.findOne({
       where: { email, username }
     });
 
     if (existingUser) {
-      return "The user with the same name or email already exists";
+      throw new ConflictException("User already exists");
     }
 
     password = await bcrypt.hash(password, salts);
@@ -59,7 +58,7 @@ export class UsersService {
     return oneUser;
   }
 
-  async update(id: number, data: UpdateUserDto) {
+  async update(id: number, data: CreateUsersInput) {
     const existingUser = await this.existing(id);
     if (!existingUser) {
       throw new NotFoundException(`User with ID ${id} not found`);

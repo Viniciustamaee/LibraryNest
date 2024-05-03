@@ -3,8 +3,8 @@ import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from "../users/entities/user.entity";
 import * as dotenv from 'dotenv';
+import { UserEntity } from "src/users/entity/users.entity";
 dotenv.config();
 
 
@@ -26,7 +26,7 @@ export class AuthService {
         return { accessToken };
     }
 
-    async login(password: string, username: string) {
+    async login(username: string,password: string) {
         const existingUser = await this.usersRepository.findOne({
             where: { username }
         });
@@ -39,6 +39,7 @@ export class AuthService {
         if (!(await bcrypt.compare(password, existingUser.password))) {
             throw new UnauthorizedException('Username or password wrong');
         }
+
 
         return { ...(await this.createToken()), user: existingUser };
     }

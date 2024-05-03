@@ -1,13 +1,18 @@
-import { rentsDelete } from "../../../../requests/rent";
+import { DELETE_RENT } from "../../../../requests/rent";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { useState } from "react";
+import { useMutation } from "@apollo/client";
 
 export default function RentsList({ rented_date, due_date, user_id, books_id, id }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const adminData = localStorage.getItem('user');
     const adminObject = JSON.parse(adminData);
     const navigate = useNavigate();
+
+
+    const [deleteRent, { loading: updatingRent }] = useMutation(DELETE_RENT);
+
 
     const deleteRents = async (e) => {
         e.preventDefault();
@@ -19,17 +24,21 @@ export default function RentsList({ rented_date, due_date, user_id, books_id, id
         const hasToken = localStorage.getItem('token');
 
         try {
-            await rentsDelete(id, {
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`,
+            await deleteRent({
+                variables: {
+                    id: id,
+                },
+                context: {
+                    headers: {
+                        'Authorization': `Bearer ${hasToken}`,
+                    },
                 },
             });
-            
+
             notifySuccess();
         } catch (error) {
             console.error('Error calling API:', error.message);
             setIsSubmitting(true);
-            notifyFail(`/Rents/${id}`);
         }
     };
 

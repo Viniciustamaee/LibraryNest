@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { validate } from "class-validator";
-import { CreateReviewDto } from "../../dto/create-review.dto";
+import { CreateReviewDto } from "../../input/create-review.dto";
 
 describe('DTO validation', () => {
     it('Create review', async () => {

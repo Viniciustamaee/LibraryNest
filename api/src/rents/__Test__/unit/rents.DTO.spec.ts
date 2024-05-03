@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { CreateRentDto } from "../../dto/create-rent.dto"
+import { CreateRentDto } from "../../../graphQL/rents/inputs/create-rent.dto"
 import { validate } from "class-validator"
 
 describe('Validation DTO', () => {

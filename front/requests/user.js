@@ -1,52 +1,78 @@
 import apiFecth from "../axios/apiAxios";
+import { gql } from '@apollo/client';
 
+export const ALL_USER = gql`
+query {
+  users {
+    id
+    email
+    username
+    password
+    img
+    description
+    admin
+  }
+}
+`;
 
-export const allUsers = async () => {
-    try {
-        const response = await apiFecth.get(`/Users`);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+export const ONE_USER = gql`
+query user($id: Int!) {
+  user(id: $id) {
+    id
+    email
+    username
+    password
+    description
+  }
 }
 
-export const oneUser = async (id) => {
-    try {
-        const response = await apiFecth.get(`/Users/${id}`);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+`
+
+export const INSERT_USER = gql`
+mutation InsertUser($data: CreateUsersInput!) {
+  createUser(data: $data) {
+    id
+    email
+    username
+    description
+    password
+    admin
+    img 
+  }
 }
-
-
-export const insertBook = async (formDataObject) => {
-    try {
-        const response = await apiFecth.post(`/Users`, formDataObject);
-        return response.data;
-    } catch {
-        console.log(error)
-        throw error;
+`;
+export const LOGIN_MUTATION = gql`
+mutation Login($username: String!, $password: String!) {
+    login(input: { username: $username, password: $password }) {
+      accessToken
+      user {
+        id
+        email
+        username
+        img
+        description
+        admin
+      }
     }
-}
+  }
+  
+  
+`;
 
-export const login = async (formData, config) => {
-    try {
-
-        const response = await apiFecth.post(`/Auth/login`, formData, config);
-        return response.data;
-    } catch {
-        console.log(error)
-        throw error;
+export const UPDATE_USER = gql`
+  mutation($id: Int!, $updateUserInput: CreateUsersInput!) {
+    updateUser(
+      id: $id,
+      updateUserInput: $updateUserInput
+    ) {
+      id
+      email
+      username
+      description
+      password
+      img
     }
-}
+  }
+`;
 
-export const updateUser = async (id, formDataObject) => {
-    try {
-        const response = await apiFecth.patch(`/Users/${id}`, formDataObject);
-        return response.data;
-    } catch {
-        console.log(error)
-        throw error;
-    }
-}
+

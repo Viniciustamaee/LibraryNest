@@ -1,34 +1,52 @@
-import apiFecth from "../axios/apiAxios";
+import { gql } from "@apollo/client";
 
-export const insertReview = async (id, formData, config) => {
-    try {
-        const response = await apiFecth.post(`/Reviews`, formData, config);
-        return response.data;
-    } catch (error) {
-        console.log(error)
-        throw error;
+export const INSER_REVIEW = gql`
+mutation($data: InputReview!) {
+  createReview(data: $data) {
+    id
+    rating
+    comment
+    user {
+      id
     }
+    book {
+      id
+    }
+  }
+}
+`;
+
+export const All_Review = gql`
+query($id: String!) {
+  reviewsByBookId(id: $id) {
+    id
+    rating
+    comment
+    user {
+      id
+      username
+      email 
+      img
+      description
+      admin
+    }
+    book {
+      id
+      title
+      img
+      quantity_available 
+      description
+    }
+  }
 }
 
-export const allReview = async (id) => {
-    try {
+`;
 
-        const response = await apiFecth.get(`/Reviews/${id}`);
-        return response.data;
-    } catch (error) {
-        console.log(error)
-        throw error;
-    }
+export const DELETE_REVIEW = gql`
+mutation($id: String!) {
+  deleteReview(id: $id) {
+    id
+  }
 }
 
-export const deleteReview = async (idReview) => {
-    try {   
-        const response = await apiFecth.delete(`/Reviews/${idReview}`);
-        return response.data;
-    } catch (error) {
-        console.log(error)
-        throw error;
-    }
-}
-
-
+`

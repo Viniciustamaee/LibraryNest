@@ -1,11 +1,13 @@
-import apiFecth from "../axios/apiAxios";
+import { gql } from "@apollo/client";
 
 
-export const allCategories = async () => {
-    try {
-        const response = await apiFecth.get(`/Categories`);
-        return response.data;
-    } catch (error) {
-        throw error;
+
+
+export const ALl_CATEGORY = gql`
+query{
+    categories{
+      id
+      category_name
     }
-}
+ }
+`;

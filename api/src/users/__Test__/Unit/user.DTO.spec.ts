@@ -1,5 +1,5 @@
 import { validate } from "class-validator";
-import { CreateUserDto } from "../../dto/create-user.dto";
+import { CreateUserDto } from "../../inputs/create-user.dto";
 import { faker } from "@faker-js/faker";
 
 describe('DTO validation', () => {

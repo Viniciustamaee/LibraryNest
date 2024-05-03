@@ -1,7 +1,7 @@
 import { CategoriesService } from '../../../categories/categories.service';
 import { AuthorsService } from '../../../authors/authors.service';
-import { CreateBookDto } from '../../dto/create-book.dto';
-import { BookEntity } from '../../entities/book.entity';
+import { CreateBookDto } from '../../inputs/create-book.dto';
+import { BookEntity } from '../../types/book.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from '../../books.service';
 import { faker } from '@faker-js/faker';

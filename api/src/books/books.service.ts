@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
-import { BookEntity } from './entities/book.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesService } from '../categories/categories.service';
 import { AuthorsService } from '../authors/authors.service';
+import { BookEntity } from './entity/books.entity';
+import { inputBook } from 'src/graphQL/book/input/book.input';
 
 @Injectable()
 export class BooksService {
@@ -17,7 +16,7 @@ export class BooksService {
     private readonly authorService: AuthorsService,
   ) { }
 
-  async create({ category_id, author_id, description, img, quantity_available, title }: CreateBookDto) {
+  async create({ category_id, author_id, description, img, quantity_available, title }) {
 
     const existingBook = await this.bookRepository.findOne({
       where: { title }
@@ -64,36 +63,55 @@ export class BooksService {
   }
 
 
-  async update(id: number, data: UpdateBookDto) {
-    const existingBooks = await this.existing(id)
 
-    if (!data) {
-      throw new NotFoundException(`Book with ID ${id} not found`);
+  async update(id: number, input: inputBook): Promise<BookEntity> {
+    const bookToUpdate = await this.bookRepository.findOne({ where: { id } });
+    if (!bookToUpdate) {
+      throw new Error('Book not found');
     }
 
+    bookToUpdate.title = input.title;
+    bookToUpdate.quantity_available = input.quantity_available;
+    bookToUpdate.img = input.img;
 
-    if (!existingBooks) {
-      throw new NotFoundException(`Book with ID ${id} not found`);
+
+    if (input.img) {
+      bookToUpdate.img = bookToUpdate.img
     }
 
-    const updateBook = await this.bookRepository.update(id, data);
+    bookToUpdate.description = input.description;
 
-    return updateBook;
+    const author = await this.authorService.findOne(input.author_id);
+    if (!author) {
+      throw new Error('Author not found');
+    }
+
+    bookToUpdate.author = author;
+
+    const category = await this.categoryService.findOne(input.category_id);
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    bookToUpdate.category = category;
+
+    return await this.bookRepository.save(bookToUpdate);
   }
+
+
 
   async remove(id: number) {
-    const existingBooks = await this.existing(id)
-
-    if (!existingBooks) {
+    const existingBook = await this.existing(id);
+  
+    if (!existingBook) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
-
-
-    const deleteBook = await this.bookRepository.delete({ id })
-
-    return deleteBook;
+  
+    await this.bookRepository.delete({ id });
+  
+    return existingBook;
   }
-
+  
 
 
   existing(id: number) {

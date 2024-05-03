@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing"
 import { AuthService } from "../../auth.service"
-import { AuthLoginDTO } from "../../dto/login-auth.dto"
+import { AuthLoginDTO } from "../../../graphQL/auth/input/login-auth.dto"
 import { faker } from "@faker-js/faker"
 import { UsersService } from "../../../users/users.service"
 import { JwtService } from "@nestjs/jwt";

@@ -1,12 +1,18 @@
-import { allCategories } from "../../../requests/categories";
-import { oneBook, updateBook } from "../../../requests/book";
 import { useParams, useNavigate } from "react-router-dom";
-import { allAuthors } from "../../../requests/author";
 import React, { useEffect, useState } from "react";
 import { Label, Select } from 'flowbite-react';
 import { toast } from 'react-toastify';
+import { useMutation, useQuery } from "@apollo/client";
+import { ALl_CATEGORY } from "../../../requests/categories";
+import { ALL_AUTHORS_QUERY } from "../../../requests/author";
+import { ONE_BOOK_QUERY, UPDATE_BOOK } from "../../../requests/book";
+import { imgForUrl } from "../../../requests/cloud";
 
 export default function newBooks() {
+    const [updateBook] = useMutation(UPDATE_BOOK);
+
+    const { loading: loadingCategory, error: errorCategory, data: dataCateogry } = useQuery(ALl_CATEGORY);
+    const { loading, error, data } = useQuery(ALL_AUTHORS_QUERY);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [categories, setCategories] = useState([]);
     const [imageUrl, setImageUrl] = useState('');
@@ -14,6 +20,10 @@ export default function newBooks() {
     const [books, setBooks] = useState({});
     const navigate = useNavigate();
     const { id } = useParams()
+
+    const { loading: loadingBook, error: errorBook, data: dataBook } = useQuery(ONE_BOOK_QUERY, {
+        variables: { id: parseFloat(id) }
+    });
 
     const [formData, setFormData] = useState({
         title: '',
@@ -23,18 +33,54 @@ export default function newBooks() {
         category_id: ''
     });
 
+
     useEffect(() => {
-        const fectcBooks = async () => {
+        const fetchBooks = async () => {
             try {
-                const response = await oneBook(id);
-                setBooks(response);
+
+                if (id) {
+                    if (!loadingBook && !errorBook && dataBook && dataBook.book) {
+                        setBooks(dataBook.book);
+                    }
+                } else if (dataBook && dataBook.books) {
+                    setBooks(data.books);
+                }
             } catch (error) {
-                console.error("Error fetching categories:", error);
+                console.error("Error searching for books:", error);
             }
         };
 
-        fectcBooks();
-    }, []);
+        fetchBooks();
+    }, [dataBook, id]);
+
+
+    useEffect(() => {
+        const fectCategory = async () => {
+            try {
+                if (dataCateogry && dataCateogry.categories) {
+                    setCategories(dataCateogry.categories);
+                }
+            } catch (error) {
+                console.error("Error searching for books:", error);
+            }
+        };
+
+        fectCategory();
+    }, [dataCateogry]);
+
+    useEffect(() => {
+        const fetchAuthors = async () => {
+            try {
+                if (data && data.author) {
+                    setAuthors(data.author);
+                }
+            } catch (error) {
+                console.error("Error searching for books:", error);
+            }
+        };
+
+        fetchAuthors();
+    }, [data]);
 
     const handleChange = (e) => {
         setBooks({
@@ -51,31 +97,7 @@ export default function newBooks() {
         }
     };
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await allCategories();
-                setCategories(response);
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            }
-        };
 
-        fetchCategories();
-    }, []);
-
-    useEffect(() => {
-        const fetchAuthors = async () => {
-            try {
-                const response = await allAuthors();
-                setAuthors(response);
-            } catch (error) {
-                console.error("Error fetching authors:", error);
-            }
-        };
-
-        fetchAuthors();
-    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -85,16 +107,25 @@ export default function newBooks() {
             setIsSubmitting(true);
 
             const formDataObject = new FormData();
-            formDataObject.append('title', books.title);
-            formDataObject.append('quantity_available', parseInt(books.quantity_available));
-            formDataObject.append('description', books.description);
             formDataObject.append('img', imageUrl);
-            formDataObject.append('author', parseInt(books.author.id));
-            formDataObject.append('category', parseInt(books.category.id));
 
-            await updateBook(id, formDataObject, {
-                headers: {
-                    'Authorization': `Bearer ${hasToken}`,
+            const img = await imgForUrl(formDataObject);
+
+            const idString = id.toString();
+
+            const inputData = {
+                title: books.title,
+                quantity_available: parseInt(books.quantity_available),
+                description: books.description,
+                category_id: parseInt(books.category.id),
+                author_id: parseInt(books.author.id),
+                img: img
+            };
+
+            await updateBook({
+                variables: {
+                    id: idString,
+                    input: inputData,
                 },
             });
 
@@ -109,6 +140,7 @@ export default function newBooks() {
             setIsSubmitting(false);
         }
     };
+
 
     const notifySucess = () => {
         toast.success("Succss edit", {

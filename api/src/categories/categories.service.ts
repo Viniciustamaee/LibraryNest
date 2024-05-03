@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoryEntity } from './entities/category.entity';
 import { Repository } from 'typeorm';
+import { CategoryEntity } from './entity/category.entity';
+import { CreateCategoryInput } from 'src/graphQL/categories/input/category.input';
 
 @Injectable()
 export class CategoriesService {
@@ -13,21 +12,21 @@ export class CategoriesService {
     private categoryRepository: Repository<CategoryEntity>
   ) { }
 
-  async create({ category_name }: CreateCategoryDto) {
-    const existingCategories = await this.categoryRepository.findOne({
+  async create({ category_name }: CreateCategoryInput): Promise<CategoryEntity> {
+    const existingCategory = await this.categoryRepository.findOne({
       where: {
         category_name: category_name
       }
-    })
-
-    if (existingCategories) {
-      return "Exist the Category"
+    });
+  
+    if (existingCategory) {
+      throw new ConflictException("Category already exists");
     }
-
-    const newCategory = await this.categoryRepository.create({ category_name });
-
+  
+    const newCategory = this.categoryRepository.create({ category_name });
     return await this.categoryRepository.save(newCategory);
   }
+  
 
   async findAll() {
     const allCategories = await this.categoryRepository.find()
@@ -46,7 +45,7 @@ export class CategoriesService {
     return oneCategory;
   }
 
-  async update(id: number, { category_name }: UpdateCategoryDto) {
+  async update(id: number, { category_name }: CreateCategoryInput) {
 
     const existingCategories = await this.existing(id)
 

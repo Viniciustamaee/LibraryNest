@@ -1,40 +1,51 @@
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { updateUser, oneUser } from '../../../requests/user';
 import { useParams, useNavigate } from 'react-router-dom';
 import Visibility from '@mui/icons-material/Visibility';
 import React, { useState, useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
 import { toast } from 'react-toastify';
+import { ONE_USER, UPDATE_USER } from '../../../requests/user';
+import { useMutation, useQuery } from '@apollo/client';
+import { imgForUrl } from "../../../requests/cloud";
+
 
 export default function EditPerfil() {
+
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const [showPassword, setShowPassword] = React.useState(false);
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [imageUrl, setImageUrl] = useState('');
 
+
     const [user, setUser] = useState({});
     const navigate = useNavigate();
+
     const { id } = useParams();
 
+
+    const { loading, error, data, refetch } = useQuery(ONE_USER, {
+        variables: { id: parseInt(id) }
+    });
+    const [updateUserMutation] = useMutation(UPDATE_USER);
+
+
+
+
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchRent = async () => {
             try {
-                const response = await oneUser(id);
-                setUser(response[0]);
+                if (data && data.user) {
+                    setUser(data.user);
+                }
             } catch (error) {
-                console.error("Error fetching user:", error);
+                console.error("Error fetching rent data:", error);
             }
         };
 
-        fetchUser();
-    }, [id]);
+        fetchRent();
 
-    const handleFileChange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageUrl(file);
-        }
-    };
+    }, [data]);
+
 
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
@@ -52,6 +63,14 @@ export default function EditPerfil() {
         }
     };
 
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            return setImageUrl(file);
+        }
+    };
 
     function logout() {
         localStorage.removeItem('token');
@@ -74,22 +93,34 @@ export default function EditPerfil() {
 
         try {
             const formDataObject = new FormData();
-            formDataObject.append('email', user.email);
-            formDataObject.append('username', user.username);
-            formDataObject.append('password', user.password);
-            formDataObject.append('description', user.description);
             formDataObject.append('img', imageUrl);
+
+
+            const img = await imgForUrl(formDataObject);
+
+
 
             if (user.password !== passwordConfirm) {
                 notifyFail("Passwords do not match");
                 return;
             }
 
-            await updateUser(id, formDataObject);
+            await updateUserMutation({
+                variables: {
+                    id: parseInt(id),
+                    updateUserInput: {
+                        email: user.email,
+                        username: user.username,
+                        password: user.password,
+                        description: user.description,
+                        img: img
+                    }
+                }
+            });
+
             navigate('/login');
             notifySuccess();
-            logout()
-
+            logout();
         } catch (error) {
             notifyFail("There is already a user with that name, please change it");
             console.error('Error calling API:', error.message);

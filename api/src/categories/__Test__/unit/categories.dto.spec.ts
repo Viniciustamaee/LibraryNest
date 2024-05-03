@@ -1,5 +1,5 @@
 import { validate } from "class-validator";
-import { CreateCategoryDto } from "../../dto/create-category.dto";
+import { CreateCategoryDto } from "../../inputs/create-category.dto";
 
 describe('DTO validation', () => {
     it('should pass validation with a valid name', async () => {

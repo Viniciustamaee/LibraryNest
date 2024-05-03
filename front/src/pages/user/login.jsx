@@ -1,15 +1,18 @@
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
-import { login } from '../../../requests/user';
+import { LOGIN_MUTATION } from '../../../requests/user';
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { useState } from 'react';
 import * as React from 'react';
+import { useMutation } from '@apollo/client';
 
 
 const Login = () => {
     const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const [loginMutation] = useMutation(LOGIN_MUTATION);
+
     const [showPassword, setShowPassword] = React.useState(false);
     const navigate = useNavigate();
 
@@ -40,15 +43,24 @@ const Login = () => {
         };
 
         try {
-            const response = await login(formData, config);
-            const data = response;
+            const response = await loginMutation({
+                variables: {
+
+                    username: formData.username,
+                    password: formData.password,
+
+
+                },
+            });
+
+
 
             setIsSubmitting(true);
 
-            localStorage.setItem('token', data.accessToken);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', response.data.login.accessToken);
+            localStorage.setItem('user', JSON.stringify(response.data.login.user));
 
-            config.headers['Authorization'] = `Bearer ${data.token}`;
+            config.headers['Authorization'] = `Bearer ${response.data.login.accessToken}`;
 
 
             notifySucess();

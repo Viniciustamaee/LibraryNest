@@ -8,15 +8,20 @@ import { AuthorsModule } from './authors/authors.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CategoryEntity } from './categories/entities/category.entity';
-import { BookEntity } from './books/entities/book.entity';
-import { RentEntity } from './rents/entities/rent.entity';
-import { AuthorEntity } from './authors/entities/author.entity';
-import { ReviewEntity } from './reviews/entities/review.entity';
-import { UserEntity } from './users/entities/user.entity';
+
+import { RentEntity } from './rents/entity/rent.entity';
+
 import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ConfigModule } from '@nestjs/config';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { GraphQLModule } from '@nestjs/graphql';
+import { AuthorEntity } from './authors/entity/authors.entity';
+import { BookEntity } from './books/entity/books.entity';
+import { CategoryEntity } from './categories/entity/category.entity';
+import { ReviewEntity } from './reviews/entity/reviews.entity';
+import { UserEntity } from './users/entity/users.entity';
 
 
 
@@ -33,6 +38,11 @@ import { ConfigModule } from '@nestjs/config';
     CategoriesModule,
     AuthModule,
     CloudinaryModule,
+
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
 
     TypeOrmModule.forRoot({
       type: 'mysql',

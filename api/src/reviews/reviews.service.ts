@@ -1,13 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateReviewDto } from './dto/create-review.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ReviewEntity } from './entities/review.entity';
 import { Repository } from 'typeorm';
 import { BooksService } from '../books/books.service';
 import { UsersService } from '../users/users.service';
-
-
-
+import { ReviewEntity } from './entity/reviews.entity';
+import { InputReview } from 'src/graphQL/reviews/input/reviews.input';
 
 @Injectable()
 export class ReviewsService {
@@ -19,7 +16,7 @@ export class ReviewsService {
     private readonly userService: UsersService,
   ) { }
 
-  async create({ book_id, rating, user_id, comment }: CreateReviewDto) {
+  async create({ book_id, rating, user_id, comment }: InputReview) {
 
     await this.userService.findOne(user_id)
     await this.bookService.findOne(book_id)
@@ -39,19 +36,15 @@ export class ReviewsService {
     return allReviews
   }
 
-
   async findOne(id: number) {
-    const allReviews = await this.reviewsRepository.find({ relations: ['book', 'user'] });
+    const reviews = await this.reviewsRepository.find({ relations: ['book', 'user'] });
 
-    const reviewsWithMatchingBookId = allReviews.filter(review => review.book.id === id);
-
-    if (reviewsWithMatchingBookId.length === 0) {
+    if (reviews.length === 0) {
       throw new NotFoundException(`No reviews found for book with ID ${id}`);
     }
 
-    return reviewsWithMatchingBookId;
+    return reviews;
   }
-
 
   async remove(id: number) {
     const existingReview = await this.reviewsRepository.findOne({
@@ -63,9 +56,9 @@ export class ReviewsService {
       throw new NotFoundException(`Review with ID ${id} not found`);
     }
 
-    const deleteBook = await this.reviewsRepository.delete({ id });
+    await this.reviewsRepository.delete({ id });
 
-    return deleteBook;
+    return existingReview;
   }
 
 
